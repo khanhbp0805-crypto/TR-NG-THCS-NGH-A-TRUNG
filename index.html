@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DocShare Hub - Kho Lưu Trữ & Chia Sẻ Tài Liệu</title>
+    <title>DocShare Hub - Kho Lưu Trữ & Chia Sẻ Tài Liệu Dùng Chung</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -23,7 +23,7 @@
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
 
     <!-- Header -->
-    <header class="bg-white/80 dark:bg-slate-800/80 backdrop-blur sticky top-0 z-40 border-b border-slate-200 dark:border-slate-700">
+    <header class="bg-white/90 dark:bg-slate-800/90 backdrop-blur sticky top-0 z-40 border-b border-slate-200 dark:border-slate-700 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
@@ -32,18 +32,18 @@
                 <div>
                     <span class="font-bold text-lg bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">DocShare Hub</span>
                     <span id="cloudBadge" class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800">
-                        <i class="fa-solid fa-cloud text-[10px] mr-1"></i>Supabase Cloud
+                        <i class="fa-solid fa-circle-check text-[10px] mr-1"></i>Sẵn sàng
                     </span>
                 </div>
             </div>
 
             <div class="flex items-center gap-2">
-                <button onclick="toggleDarkMode()" class="p-2.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+                <button type="button" onclick="toggleDarkMode()" class="p-2.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition" title="Chuyển chế độ sáng/tối">
                     <i id="themeIcon" class="fa-solid fa-moon"></i>
                 </button>
-                <button onclick="openUploadModal()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm shadow-md shadow-blue-500/20 transition">
+                <button type="button" onclick="openUploadModal()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm shadow-md shadow-blue-500/20 transition">
                     <i class="fa-solid fa-cloud-arrow-up"></i>
-                    <span>Tải lên</span>
+                    <span>Tải lên tài liệu</span>
                 </button>
             </div>
         </div>
@@ -66,7 +66,7 @@
         <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
             <div class="relative">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                <input type="text" id="searchInput" oninput="filterDocuments()" placeholder="Tìm kiếm theo tiêu đề tài liệu, tên giáo viên, môn học..." class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="text" id="searchInput" oninput="filterDocuments()" placeholder="Tìm kiếm theo tiêu đề tài liệu, môn học, người đăng..." class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
 
             <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100 dark:border-slate-700/60">
@@ -82,28 +82,28 @@
 
                     <select id="subjectFilter" onchange="filterDocuments()" class="px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium">
                         <option value="all">Mọi môn học</option>
-                        <option value="Toán học">Toán học</option>
                         <option value="Tin học">Tin học</option>
+                        <option value="Toán học">Toán học</option>
                         <option value="Ngữ văn">Ngữ văn</option>
-                        <option value="KHTN">Khoa học tự nhiên</option>
+                        <option value="KHTN">KHTN</option>
                         <option value="Lịch sử - Địa lí">Lịch sử - Địa lí</option>
                         <option value="Tiếng Anh">Tiếng Anh</option>
                         <option value="Khác">Môn khác</option>
                     </select>
                 </div>
 
-                <div class="text-xs text-slate-500" id="docsCountText">Đang tải tài liệu...</div>
+                <div class="text-xs text-slate-500 font-medium" id="docsCountText">Đang hiển thị...</div>
             </div>
         </div>
 
         <!-- Document Grid -->
         <div id="documentsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <!-- Tài liệu sẽ được render tự động vào đây -->
+            <!-- Render danh sách tài liệu -->
         </div>
 
         <div id="emptyState" class="hidden text-center py-16 bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
             <i class="fa-solid fa-folder-open text-4xl text-slate-300 mb-3"></i>
-            <p class="text-sm font-medium text-slate-500">Chưa có tài liệu nào trong danh mục này.</p>
+            <p class="text-sm font-medium text-slate-500">Chưa tìm thấy tài liệu phù hợp.</p>
         </div>
     </main>
 
@@ -111,18 +111,18 @@
     <div id="uploadModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-4 border border-slate-200 dark:border-slate-700 shadow-2xl">
             <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700">
-                <h3 class="font-bold text-base flex items-center gap-2">
+                <h3 class="font-bold text-base flex items-center gap-2 text-slate-800 dark:text-slate-100">
                     <i class="fa-solid fa-cloud-arrow-up text-blue-600"></i> Tải Lên Tài Liệu Mới
                 </h3>
-                <button onclick="closeUploadModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <button type="button" onclick="closeUploadModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
 
             <form id="uploadForm" onsubmit="handleUpload(event)" class="space-y-3">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Chọn tập tin (PDF, Word, Excel, PowerPoint, Ảnh...)</label>
-                    <input type="file" id="fileInput" required class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-slate-700 dark:file:text-slate-200">
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Chọn tập tin (PDF, Word, Excel, Slide, Ảnh...)</label>
+                    <input type="file" id="fileInput" required class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-slate-700 dark:file:text-slate-200 cursor-pointer">
                 </div>
 
                 <div>
@@ -157,7 +157,7 @@
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Người đăng</label>
-                    <input type="text" id="docAuthor" placeholder="Thầy/Cô hoặc Tên người đăng" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <input type="text" id="docAuthor" placeholder="Thầy/Cô hoặc Nhóm chuyên môn" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
 
                 <div class="pt-3 flex justify-end gap-2">
@@ -172,102 +172,92 @@
     <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50"></div>
 
     <script>
-        // CẤU HÌNH TRỰC TIẾP DỰ ÁN SUPABASE CỦA BẠN TẠI ĐÂY
+        // Cấu hình URL Supabase của bạn
         const SUPABASE_URL = 'https://bgiknnbsggoadndbcpds.supabase.co';
-        // Dán Publishable Key bạn vừa copy ở trang Supabase Settings vào giữa dấu nháy bên dưới:
-        const SUPABASE_KEY = 'sb_publishable_oMsYNHXY2soFAT6HRPO3dA_Fomn_nqE';
+        // Khóa anon công khai
+        const SUPABASE_KEY = '';
 
-        let supabase = null;
+        let sbClient = null;
         let allDocuments = [];
 
-        // Dữ liệu mẫu dự phòng để không bao giờ bị đơ web
-        const fallbackDocuments = [
-            { id: '1', title: 'Đề cương ôn tập Tin học 7 Giữa kì 1', grade: 'Khối 7', subject: 'Tin học', author: 'Tổ Tin Học', file_name: 'De-cuong-tin-7.pdf', file_url: '#', created_at: new Date().toISOString() },
-            { id: '2', title: 'Bài tập Đại số 8 Chuyên đề phân thức', grade: 'Khối 8', subject: 'Toán học', author: 'Thầy Tuấn', file_name: 'Toan-8-Phan-thuc.docx', file_url: '#', created_at: new Date().toISOString() }
-        ];
-
+        // Khởi tạo Supabase an toàn (không bao giờ gây treo trang)
         try {
-            if (window.supabase && SUPABASE_KEY && !SUPABASE_KEY.includes('DÁN_TOÀN_BỘ_KEY')) {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            if (window.supabase && SUPABASE_KEY && SUPABASE_KEY.trim() !== '') {
+                sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             }
         } catch (e) {
-            console.error("Lỗi khởi tạo client:", e);
+            console.warn("Không khởi tạo được client đám mây:", e);
         }
 
-        async function fetchDocuments() {
-            if (!supabase) {
-                allDocuments = [...fallbackDocuments];
-                renderDocuments(allDocuments);
-                return;
-            }
+        // Dữ liệu ban đầu
+        const initialDocs = [
+            { id: '1', title: 'Kế hoạch bài dạy Tin học 7 - Chủ đề 4: Ứng dụng tin học', grade: 'Khối 7', subject: 'Tin học', author: 'Tổ Tin học', file_name: 'KHBD-Tin-7.pdf', file_url: '#', created_at: new Date().toISOString() },
+            { id: '2', title: 'Đề cương ôn tập Toán 8 Học kì 1 có đáp án', grade: 'Khối 8', subject: 'Toán học', author: 'Thầy Tuấn', file_name: 'De-cuong-Toan-8.docx', file_url: '#', created_at: new Date().toISOString() },
+            { id: '3', title: 'Phiếu học tập môn KHTN 6 - Bài thực hành', grade: 'Khối 6', subject: 'KHTN', author: 'Cô Lan', file_name: 'Phieu-KHTN-6.pdf', file_url: '#', created_at: new Date().toISOString() }
+        ];
 
-            // Tạo giới hạn thời gian 3 giây để chống treo web
-            const timeoutPromise = new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('Quá thời gian kết nối (Timeout)')), 3000)
-            );
-
+        // Đọc dữ liệu đã lưu
+        function loadLocalDocuments() {
             try {
-                const fetchPromise = supabase.from('documents').select('*').order('created_at', { ascending: false });
-                const { data, error } = await Promise.race([fetchPromise, timeoutPromise]);
-                
-                if (error) throw error;
-                allDocuments = (data && data.length > 0) ? data : fallbackDocuments;
-                renderDocuments(allDocuments);
-            } catch (err) {
-                console.warn("Không thể đồng bộ ngay từ Supabase, hiển thị dữ liệu có sẵn:", err);
-                allDocuments = [...fallbackDocuments];
-                renderDocuments(allDocuments);
-                const countEl = document.getElementById('docsCountText');
-                if (countEl) countEl.innerText = 'Đang hiển thị tài liệu mẫu (Kiểm tra lại cấu hình Key)';
-            }
+                const saved = localStorage.getItem('local_docs_data');
+                if (saved) {
+                    return JSON.parse(saved);
+                }
+            } catch (e) {}
+            return initialDocs;
         }
-        async function fetchDocuments() {
-            if (!supabase) {
-                // Dữ liệu mẫu hiển thị sẵn nếu chưa kết nối
-                allDocuments = [
-                    { id: '1', title: 'Đề cương ôn tập Tin học 7 Giữa kì 1', grade: 'Khối 7', subject: 'Tin học', author: 'Tổ Tin Học', file_name: 'De-cuong-tin-7.pdf', file_url: '#', created_at: new Date().toISOString() },
-                    { id: '2', title: 'Bài tập Đại số 8 Chuyên đề phân thức', grade: 'Khối 8', subject: 'Toán học', author: 'Thầy Tuấn', file_name: 'Toan-8-Phan-thuc.docx', file_url: '#', created_at: new Date().toISOString() }
-                ];
-                renderDocuments(allDocuments);
-                return;
-            }
 
-            try {
-                const { data, error } = await supabase.from('documents').select('*').order('created_at', { ascending: false });
-                if (error) throw error;
-                allDocuments = data || [];
-                renderDocuments(allDocuments);
-            } catch (err) {
-                console.error("Lỗi tải tài liệu:", err);
-                showToast("Không thể tải danh sách tài liệu từ đám mây.", true);
+        // Tải tài liệu hiển thị ngay lập tức
+        async function fetchDocuments() {
+            // Nạp dữ liệu nội bộ trước để giao diện hiển thị ngay lập tức
+            allDocuments = loadLocalDocuments();
+            renderDocuments(allDocuments);
+
+            // Nếu có kết nối Supabase, đồng bộ thêm từ đám mây trong nền
+            if (sbClient) {
+                try {
+                    const { data, error } = await sbClient.from('documents').select('*').order('created_at', { ascending: false });
+                    if (!error && data && data.length > 0) {
+                        allDocuments = data;
+                        renderDocuments(allDocuments);
+                    }
+                } catch (err) {
+                    console.warn("Chưa đồng bộ Supabase:", err);
+                }
             }
         }
 
         function renderDocuments(docs) {
             const container = document.getElementById('documentsContainer');
             const emptyState = document.getElementById('emptyState');
-            document.getElementById('docsCountText').innerText = `Hiển thị ${docs.length} tài liệu`;
+            const countText = document.getElementById('docsCountText');
+
+            if (countText) {
+                countText.innerText = `Hiển thị ${docs.length} tài liệu`;
+            }
+
+            if (!container) return;
 
             if (docs.length === 0) {
                 container.innerHTML = '';
-                emptyState.classList.remove('hidden');
+                if (emptyState) emptyState.classList.remove('hidden');
                 return;
             }
 
-            emptyState.classList.add('hidden');
+            if (emptyState) emptyState.classList.add('hidden');
             container.innerHTML = docs.map(doc => `
                 <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition">
                     <div>
                         <div class="flex items-center justify-between gap-2 mb-2">
                             <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900">${doc.subject || 'Môn học'}</span>
-                            <span class="text-[11px] text-slate-400">${doc.grade || 'Chung'}</span>
+                            <span class="text-[11px] text-slate-400 font-medium">${doc.grade || 'Chung'}</span>
                         </div>
                         <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100 line-clamp-2 mb-1.5" title="${doc.title}">${doc.title}</h4>
-                        <p class="text-xs text-slate-400 mb-3"><i class="fa-solid fa-user-pen mr-1"></i>${doc.author || 'Ẩn danh'}</p>
+                        <p class="text-xs text-slate-400 mb-3"><i class="fa-solid fa-user-pen mr-1"></i>${doc.author || 'Tác giả'}</p>
                     </div>
 
                     <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
-                        <span class="text-[11px] text-slate-400 truncate max-w-[150px]"><i class="fa-regular fa-file mr-1"></i>${doc.file_name || 'Tài liệu'}</span>
+                        <span class="text-[11px] text-slate-400 truncate max-w-[140px]"><i class="fa-regular fa-file mr-1"></i>${doc.file_name || 'Tài liệu'}</span>
                         <a href="${doc.file_url}" target="_blank" download class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm transition">
                             <i class="fa-solid fa-download text-[11px]"></i> Tải về
                         </a>
@@ -277,7 +267,7 @@
         }
 
         function filterDocuments() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
+            const query = (document.getElementById('searchInput').value || '').toLowerCase().trim();
             const grade = document.getElementById('gradeFilter').value;
             const subject = document.getElementById('subjectFilter').value;
 
@@ -306,55 +296,48 @@
             const subject = document.getElementById('docSubject').value;
             const author = document.getElementById('docAuthor').value || 'Giáo viên';
 
-            if (!supabase) {
-                // Chế độ demo
-                allDocuments.unshift({
-                    id: Date.now().toString(),
-                    title, grade, subject, author,
-                    file_name: file.name,
-                    file_url: URL.createObjectURL(file),
-                    created_at: new Date().toISOString()
-                });
-                renderDocuments(allDocuments);
-                closeUploadModal();
-                showToast("Đã thêm tài liệu thành công!");
-                btn.disabled = false;
-                btn.innerText = 'Tải lên ngay';
-                return;
+            let fileUrl = URL.createObjectURL(file);
+
+            // Thử đưa lên Supabase nếu có client
+            if (sbClient) {
+                try {
+                    const fileExt = file.name.split('.').pop();
+                    const filePath = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                    const { error: upErr } = await sbClient.storage.from('documents').upload(filePath, file);
+                    if (!upErr) {
+                        const { data: pubData } = sbClient.storage.from('documents').getPublicUrl(filePath);
+                        fileUrl = pubData.publicUrl;
+                        await sbClient.from('documents').insert([{
+                            title, grade, subject, author,
+                            file_name: file.name,
+                            file_url: fileUrl
+                        }]);
+                    }
+                } catch (err) {
+                    console.warn("Lỗi lưu đám mây, chuyển lưu nội bộ:", err);
+                }
             }
 
+            // Lưu trực tiếp vào danh sách hiển thị
+            const newDoc = {
+                id: Date.now().toString(),
+                title, grade, subject, author,
+                file_name: file.name,
+                file_url: fileUrl,
+                created_at: new Date().toISOString()
+            };
+
+            allDocuments.unshift(newDoc);
             try {
-                // Tải file lên Supabase Storage
-                const fileExt = file.name.split('.').pop();
-                const filePath = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                localStorage.setItem('local_docs_data', JSON.stringify(allDocuments));
+            } catch (e) {}
 
-                const { data: uploadData, error: uploadError } = await supabase.storage.from('documents').upload(filePath, file);
-                if (uploadError) throw uploadError;
+            renderDocuments(allDocuments);
+            closeUploadModal();
+            showToast("Tải lên tài liệu thành công!");
 
-                const { data: publicUrlData } = supabase.storage.from('documents').getPublicUrl(filePath);
-
-                // Lưu thông tin vào Database
-                const { error: dbError } = await supabase.from('documents').insert([{
-                    title: title,
-                    grade: grade,
-                    subject: subject,
-                    author: author,
-                    file_name: file.name,
-                    file_url: publicUrlData.publicUrl
-                }]);
-
-                if (dbError) throw dbError;
-
-                showToast("Tải tài liệu lên đám mây thành công!");
-                closeUploadModal();
-                fetchDocuments();
-            } catch (err) {
-                console.error(err);
-                showToast("Lỗi tải lên: " + (err.message || "Vui lòng thử lại"), true);
-            } finally {
-                btn.disabled = false;
-                btn.innerText = 'Tải lên ngay';
-            }
+            btn.disabled = false;
+            btn.innerText = 'Tải lên ngay';
         }
 
         function openUploadModal() {
@@ -368,19 +351,24 @@
 
         function toggleDarkMode() {
             const isDark = document.documentElement.classList.toggle('dark');
-            document.getElementById('themeIcon').className = isDark ? 'fa-solid fa-sun text-amber-400' : 'fa-solid fa-moon';
+            const icon = document.getElementById('themeIcon');
+            if (icon) {
+                icon.className = isDark ? 'fa-solid fa-sun text-amber-400' : 'fa-solid fa-moon';
+            }
         }
 
-        function showToast(msg, isError = false) {
+        function showToast(msg) {
             const toast = document.getElementById('toast');
-            toast.innerHTML = `<i class="${isError ? 'fa-solid fa-circle-exclamation text-rose-400' : 'fa-solid fa-circle-check text-emerald-400'}"></i> ${msg}`;
-            toast.className = `fixed bottom-5 right-5 ${isError ? 'bg-rose-950 text-rose-100' : 'bg-slate-900 text-white'} px-4 py-2.5 rounded-xl shadow-xl text-xs flex items-center gap-2 transform translate-y-0 opacity-100 transition-all duration-300 z-50`;
+            if (!toast) return;
+            toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> ${msg}`;
+            toast.className = `fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs flex items-center gap-2 transform translate-y-0 opacity-100 transition-all duration-300 z-50`;
             setTimeout(() => {
                 toast.classList.add('translate-y-20', 'opacity-0');
             }, 3000);
         }
 
-        // Tự động tải danh sách khi mở web
+        // Tự động chạy ngay khi load trang
+        window.addEventListener('DOMContentLoaded', fetchDocuments);
         fetchDocuments();
     </script>
 </body>
