@@ -180,15 +180,47 @@
         let supabase = null;
         let allDocuments = [];
 
-        // Khởi tạo Supabase
+        // Dữ liệu mẫu dự phòng để không bao giờ bị đơ web
+        const fallbackDocuments = [
+            { id: '1', title: 'Đề cương ôn tập Tin học 7 Giữa kì 1', grade: 'Khối 7', subject: 'Tin học', author: 'Tổ Tin Học', file_name: 'De-cuong-tin-7.pdf', file_url: '#', created_at: new Date().toISOString() },
+            { id: '2', title: 'Bài tập Đại số 8 Chuyên đề phân thức', grade: 'Khối 8', subject: 'Toán học', author: 'Thầy Tuấn', file_name: 'Toan-8-Phan-thuc.docx', file_url: '#', created_at: new Date().toISOString() }
+        ];
+
         try {
-            if (window.supabase && SUPABASE_KEY && !SUPABASE_KEY.includes('YOUR_ACTUAL_KEY')) {
+            if (window.supabase && SUPABASE_KEY && !SUPABASE_KEY.includes('DÁN_TOÀN_BỘ_KEY')) {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             }
         } catch (e) {
-            console.error("Lỗi kết nối Supabase:", e);
+            console.error("Lỗi khởi tạo client:", e);
         }
 
+        async function fetchDocuments() {
+            if (!supabase) {
+                allDocuments = [...fallbackDocuments];
+                renderDocuments(allDocuments);
+                return;
+            }
+
+            // Tạo giới hạn thời gian 3 giây để chống treo web
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Quá thời gian kết nối (Timeout)')), 3000)
+            );
+
+            try {
+                const fetchPromise = supabase.from('documents').select('*').order('created_at', { ascending: false });
+                const { data, error } = await Promise.race([fetchPromise, timeoutPromise]);
+                
+                if (error) throw error;
+                allDocuments = (data && data.length > 0) ? data : fallbackDocuments;
+                renderDocuments(allDocuments);
+            } catch (err) {
+                console.warn("Không thể đồng bộ ngay từ Supabase, hiển thị dữ liệu có sẵn:", err);
+                allDocuments = [...fallbackDocuments];
+                renderDocuments(allDocuments);
+                const countEl = document.getElementById('docsCountText');
+                if (countEl) countEl.innerText = 'Đang hiển thị tài liệu mẫu (Kiểm tra lại cấu hình Key)';
+            }
+        }
         async function fetchDocuments() {
             if (!supabase) {
                 // Dữ liệu mẫu hiển thị sẵn nếu chưa kết nối
