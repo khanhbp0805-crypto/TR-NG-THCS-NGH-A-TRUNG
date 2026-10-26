@@ -1,1724 +1,355 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chia Sẻ Tài Liệu Trường Học & Giáo Viên</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Supabase JS Client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#eff6ff',
-              100: '#dbeafe',
-              500: '#3b82f6',
-              600: '#2563eb',
-              700: '#1d4ed8'
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocShare Hub - Kho Lưu Trữ & Chia Sẻ Tài Liệu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50: '#eff6ff', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' }
+                    }
+                }
             }
-          }
         }
-      }
-    }
-  </script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    body { font-family: 'Inter', sans-serif; }
-    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(156, 163, 175, 0.4); border-radius: 9999px; }
-  </style>
+    </script>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
 
-  <!-- Header Navigation -->
-  <header class="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
-      <!-- Logo -->
-      <div class="flex items-center gap-3 shrink-0">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
-          <i data-lucide="graduation-cap" class="w-6 h-6"></i>
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <span class="font-bold text-base sm:text-lg text-slate-900 dark:text-white tracking-tight">DocShare</span>
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">CLOUD</span>
-          </div>
-          <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">Kho học liệu điện tử & tài liệu dùng chung</p>
-        </div>
-      </div>
-
-      <!-- Cloud Status Badge & Search -->
-      <div class="flex-1 max-w-md hidden md:flex items-center gap-3">
-        <div class="relative w-full">
-          <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-          <input type="text" id="globalSearchInput" placeholder="Tìm tài liệu, môn học, giáo viên, từ khóa..." 
-                 class="w-full pl-10 pr-4 py-2 text-xs sm:text-sm rounded-xl bg-slate-100 dark:bg-slate-800 border-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:bg-white dark:focus:bg-slate-950 transition outline-none">
-        </div>
-      </div>
-
-      <!-- Header Action Controls -->
-      <div class="flex items-center gap-2 sm:gap-2.5">
-        <!-- Cloud Status Pill Button -->
-        <button id="cloudStatusBtn" class="flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-medium transition bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-blue-400">
-          <span id="cloudStatusDot" class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
-          <span id="cloudStatusText" class="hidden sm:inline text-slate-600 dark:text-slate-300">Offline Demo</span>
-        </button>
-
-        <!-- Settings Button -->
-        <button id="openSettingsBtn" title="Cài đặt kết nối Supabase Cloud" class="p-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-          <i data-lucide="settings" class="w-5 h-5"></i>
-        </button>
-
-        <!-- Dark/Light Theme Button -->
-        <button id="themeToggleBtn" aria-label="Đổi giao diện" class="p-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-          <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
-          <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
-        </button>
-
-        <!-- Upload Document Button -->
-        <button id="openUploadModalBtn" class="flex items-center gap-1.5 sm:gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs sm:text-sm px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-sm shadow-blue-600/30 transition transform active:scale-95">
-          <i data-lucide="upload-cloud" class="w-4 h-4"></i>
-          <span class="font-semibold">Tải lên</span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Content Layout -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col gap-5">
-
-    <!-- Cloud Status Announcement Banner -->
-    <div id="offlineNoticeBanner" class="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs sm:text-sm text-amber-800 dark:text-amber-200">
-      <div class="flex items-center gap-2.5">
-        <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-500 shrink-0"></i>
-        <span>Bạn đang ở <strong>Chế độ Thử nghiệm Nội bộ (IndexedDB)</strong>. Để mọi người ở máy khác xem và tải được cùng lúc, hãy kết nối Supabase miễn phí.</span>
-      </div>
-      <button onclick="document.getElementById('openSettingsBtn').click()" class="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg shrink-0 transition text-xs shadow-sm">
-        Kết nối Supabase ngay
-      </button>
-    </div>
-
-    <!-- Hero / Summary Banner -->
-    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-700 via-indigo-700 to-sky-700 p-6 text-white shadow-lg">
-      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
-        <div>
-          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/15 text-xs text-blue-100 font-medium mb-2 backdrop-blur-sm">
-            <i data-lucide="school" class="w-3.5 h-3.5"></i> Cổng trao đổi giáo án, bài giảng & đề thi trực tuyến
-          </div>
-          <h1 class="text-xl sm:text-2xl font-bold tracking-tight">Thư Viện Tài Liệu Dùng Chung</h1>
-          <p class="text-xs sm:text-sm text-blue-100 mt-1 max-w-xl">
-            Tải lên tài liệu giảng dạy, tài liệu ôn tập của bạn lên đám mây để học sinh và các thầy cô đồng nghiệp truy cập tức thì.
-          </p>
-        </div>
-        <div class="flex items-center gap-4 text-xs sm:text-sm bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/20 shrink-0">
-          <div class="text-center">
-            <span id="statTotalDocs" class="block font-bold text-lg leading-tight">0</span>
-            <span class="text-blue-100 text-xs">Tài liệu</span>
-          </div>
-          <div class="w-px h-8 bg-white/20"></div>
-          <div class="text-center">
-            <span id="statTotalDownloads" class="block font-bold text-lg leading-tight">0</span>
-            <span class="text-blue-100 text-xs">Lượt tải</span>
-          </div>
-          <div class="w-px h-8 bg-white/20"></div>
-          <div class="text-center">
-            <span id="statTotalLikes" class="block font-bold text-lg leading-tight">0</span>
-            <span class="text-blue-100 text-xs">Yêu thích</span>
-          </div>
-        </div>
-      </div>
-      <div class="absolute -right-12 -bottom-12 w-52 h-52 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
-    </div>
-
-    <!-- Filter & Toolbar -->
-    <section class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-200/80 dark:border-slate-700/80 flex flex-col gap-3.5">
-      <!-- Mobile Search Bar -->
-      <div class="block md:hidden">
-        <div class="relative">
-          <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-          <input type="text" id="mobileSearchInput" placeholder="Tìm tài liệu, môn học, tác giả..." 
-                 class="w-full pl-10 pr-4 py-2 text-xs rounded-xl bg-slate-100 dark:bg-slate-700/50 border-none focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-      </div>
-
-      <!-- Subject Category Buttons -->
-      <div class="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
-        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1">
-          <i data-lucide="book-open" class="w-3.5 h-3.5"></i> Môn học:
-        </span>
-        <button data-category="ALL" class="category-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition shrink-0 shadow-sm">
-          Tất cả
-        </button>
-        <button data-category="Toán học" class="category-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 transition shrink-0">
-          📐 Toán học
-        </button>
-        <button data-category="Tin học" class="category-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 transition shrink-0">
-          💻 Tin học
-        </button>
-        <button data-category="Ngữ văn" class="category-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 transition shrink-0">
-          ✍️ Ngữ văn
-        </button>
-        <button data-category="Ngoại ngữ" class="category-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 transition shrink-0">
-          🌐 Ngoại ngữ
-        </button>
-        <button data-category="KHTN" class="category-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 transition shrink-0">
-          🔬 Khoa học tự nhiên
-        </button>
-        <button data-category="Sử - Địa" class="category-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 transition shrink-0">
-          🌏 Lịch sử - Địa lý
-        </button>
-        <button data-category="Khác" class="category-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 transition shrink-0">
-          📦 Tài liệu chung
-        </button>
-      </div>
-
-      <!-- Grade Filter, Format Filter, Sort & View Mode -->
-      <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-700/60">
-        <div class="flex flex-wrap items-center gap-2">
-          <!-- Grade Filter -->
-          <select id="gradeFilter" class="bg-slate-100 dark:bg-slate-700/60 text-xs font-medium text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-lg border-none focus:ring-1 focus:ring-blue-500 outline-none">
-            <option value="ALL">Mọi khối lớp</option>
-            <option value="Khối 6">Khối 6</option>
-            <option value="Khối 7">Khối 7</option>
-            <option value="Khối 8">Khối 8</option>
-            <option value="Khối 9">Khối 9</option>
-            <option value="Khối 10">Khối 10</option>
-            <option value="Khối 11">Khối 11</option>
-            <option value="Khối 12">Khối 12</option>
-            <option value="Giáo viên">Dành cho Giáo viên</option>
-          </select>
-
-          <!-- Format Filter -->
-          <select id="formatFilter" class="bg-slate-100 dark:bg-slate-700/60 text-xs font-medium text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-lg border-none focus:ring-1 focus:ring-blue-500 outline-none">
-            <option value="ALL">Mọi định dạng</option>
-            <option value="pdf">PDF (.pdf)</option>
-            <option value="word">Word (.docx, .doc)</option>
-            <option value="excel">Excel (.xlsx)</option>
-            <option value="slide">PowerPoint (.pptx)</option>
-            <option value="image">Hình ảnh (.png, .jpg)</option>
-            <option value="text">Văn bản / Code</option>
-          </select>
-
-          <!-- Favorites Toggle -->
-          <button id="toggleFavoritesBtn" class="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 hover:bg-red-50 hover:text-red-600 transition">
-            <i data-lucide="heart" class="w-3.5 h-3.5"></i>
-            <span>Đã thích</span>
-          </button>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <!-- Sort Options -->
-          <div class="flex items-center gap-1.5">
-            <span class="text-xs text-slate-400 hidden sm:inline">Sắp xếp:</span>
-            <select id="sortBy" class="bg-slate-100 dark:bg-slate-700/60 text-xs font-medium text-slate-700 dark:text-slate-200 px-2.5 py-1.5 rounded-lg border-none focus:ring-1 focus:ring-blue-500 outline-none">
-              <option value="newest">Mới nhất</option>
-              <option value="popular">Tải nhiều nhất</option>
-              <option value="title">Tên A-Z</option>
-            </select>
-          </div>
-
-          <!-- Refresh Data Button -->
-          <button id="refreshDataBtn" title="Làm mới dữ liệu từ máy chủ" class="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
-            <i data-lucide="rotate-cw" class="w-4 h-4"></i>
-          </button>
-
-          <!-- View Switchers -->
-          <div class="flex items-center bg-slate-100 dark:bg-slate-700 p-0.5 rounded-lg">
-            <button id="viewGridBtn" title="Dạng lưới" class="p-1.5 rounded-md bg-white dark:bg-slate-600 text-blue-600 dark:text-blue-400 shadow-xs transition">
-              <i data-lucide="grid" class="w-4 h-4"></i>
-            </button>
-            <button id="viewListBtn" title="Dạng danh sách" class="p-1.5 rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition">
-              <i data-lucide="list" class="w-4 h-4"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Documents Presentation Container -->
-    <section>
-      <!-- Loading Indicator -->
-      <div id="loadingSpinner" class="hidden flex-col items-center justify-center p-12 text-center">
-        <div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-        <p class="text-xs text-slate-500 mt-3 font-medium">Đang tải dữ liệu đám mây...</p>
-      </div>
-
-      <!-- Empty State -->
-      <div id="emptyState" class="hidden flex-col items-center justify-center p-12 bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 text-center">
-        <div class="w-16 h-16 bg-blue-50 dark:bg-slate-700 text-blue-500 rounded-full flex items-center justify-center mb-3">
-          <i data-lucide="file-question" class="w-8 h-8"></i>
-        </div>
-        <h3 class="text-base font-semibold text-slate-800 dark:text-slate-200">Không tìm thấy tài liệu phù hợp</h3>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm">Hãy thử thay đổi điều kiện lọc hoặc đóng góp tài liệu đầu tiên cho trường học!</p>
-        <button onclick="document.getElementById('openUploadModalBtn').click()" class="mt-4 px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-xl shadow hover:bg-blue-700 transition">
-          + Tải lên tài liệu mới
-        </button>
-      </div>
-
-      <!-- Grid Cards View -->
-      <div id="documentsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <!-- JS rendered -->
-      </div>
-
-      <!-- Table View -->
-      <div id="documentsTableWrapper" class="hidden overflow-hidden bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs sm:text-sm">
-            <thead class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
-              <tr>
-                <th class="py-3 px-4">Tài liệu</th>
-                <th class="py-3 px-3">Môn học</th>
-                <th class="py-3 px-3">Khối lớp</th>
-                <th class="py-3 px-3">Tác giả</th>
-                <th class="py-3 px-3">Kích thước</th>
-                <th class="py-3 px-3">Ngày đăng</th>
-                <th class="py-3 px-3 text-center">Tải/Thích</th>
-                <th class="py-3 px-4 text-right">Thao tác</th>
-              </tr>
-            </thead>
-            <tbody id="documentsTableBody" class="divide-y divide-slate-100 dark:divide-slate-700/60">
-              <!-- JS rendered -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- Upload Modal -->
-  <div id="uploadModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
-    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 dark:border-slate-700 transform scale-95 transition-transform duration-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
-        <div class="flex items-center gap-2">
-          <div class="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400">
-            <i data-lucide="upload-cloud" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <h3 class="font-bold text-base text-slate-900 dark:text-white">Tải Lên Tài Liệu Chia Sẻ</h3>
-            <p id="uploadTargetBadge" class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">Lưu vào Supabase Cloud</p>
-          </div>
-        </div>
-        <button id="closeUploadModalBtn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <form id="uploadForm" class="mt-4 space-y-4">
-        <!-- Dropzone -->
-        <div id="dropZone" class="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl p-5 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50/40 dark:hover:bg-slate-750 transition flex flex-col items-center justify-center">
-          <input type="file" id="fileInput" class="hidden">
-          <div class="w-12 h-12 bg-blue-50 dark:bg-slate-700 text-blue-500 rounded-full flex items-center justify-center mb-2">
-            <i data-lucide="file-up" class="w-6 h-6"></i>
-          </div>
-          <p class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200">Kéo thả file vào đây hoặc <span class="text-blue-600 dark:text-blue-400 underline">chọn từ thiết bị</span></p>
-          <p class="text-[11px] text-slate-400 mt-1">Hỗ trợ PDF, Word, Excel, PowerPoint, Ảnh, Text...</p>
-          
-          <div id="selectedFileInfo" class="hidden mt-3 w-full bg-blue-50 dark:bg-slate-700 p-2.5 rounded-lg flex items-center justify-between text-left">
-            <div class="flex items-center gap-2 truncate">
-              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500 shrink-0"></i>
-              <span id="selectedFileName" class="text-xs font-semibold text-slate-700 dark:text-slate-200 truncate"></span>
+    <!-- Header -->
+    <header class="bg-white/80 dark:bg-slate-800/80 backdrop-blur sticky top-0 z-40 border-b border-slate-200 dark:border-slate-700">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+                    <i class="fa-solid fa-graduation-cap text-lg"></i>
+                </div>
+                <div>
+                    <span class="font-bold text-lg bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">DocShare Hub</span>
+                    <span id="cloudBadge" class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800">
+                        <i class="fa-solid fa-cloud text-[10px] mr-1"></i>Supabase Cloud
+                    </span>
+                </div>
             </div>
-            <span id="selectedFileSize" class="text-[11px] text-slate-500 dark:text-slate-400 shrink-0 ml-2"></span>
-          </div>
+
+            <div class="flex items-center gap-2">
+                <button onclick="toggleDarkMode()" class="p-2.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+                    <i id="themeIcon" class="fa-solid fa-moon"></i>
+                </button>
+                <button onclick="openUploadModal()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm shadow-md shadow-blue-500/20 transition">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span>Tải lên</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+        <!-- Banner -->
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white p-6 md:p-8 shadow-lg">
+            <div class="relative z-10 max-w-2xl">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-white/20 backdrop-blur-md mb-3">
+                    <i class="fa-solid fa-school text-[11px]"></i> Cổng chia sẻ đề thi, giáo án & tài liệu dùng chung
+                </span>
+                <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight mb-2">Kho Tài Liệu Trực Tuyến Dùng Chung</h1>
+                <p class="text-blue-100 text-sm md:text-base leading-relaxed">Tải lên và chia sẻ tài liệu giảng dạy, bài giảng điện tử, đề kiểm tra dễ dàng giữa giáo viên và học sinh mọi lúc, mọi nơi.</p>
+            </div>
         </div>
 
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Tiêu đề tài liệu <span class="text-red-500">*</span></label>
-          <input type="text" id="docTitle" required placeholder="VD: Đề cương ôn tập Toán giữa HK1 - Khối 8" 
-                 class="w-full px-3.5 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 outline-none">
+        <!-- Filter & Search Bar -->
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="searchInput" oninput="filterDocuments()" placeholder="Tìm kiếm theo tiêu đề tài liệu, tên giáo viên, môn học..." class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100 dark:border-slate-700/60">
+                <div class="flex flex-wrap items-center gap-2">
+                    <select id="gradeFilter" onchange="filterDocuments()" class="px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium">
+                        <option value="all">Mọi khối lớp</option>
+                        <option value="Khối 6">Khối 6</option>
+                        <option value="Khối 7">Khối 7</option>
+                        <option value="Khối 8">Khối 8</option>
+                        <option value="Khối 9">Khối 9</option>
+                        <option value="Chung">Tài liệu chung</option>
+                    </select>
+
+                    <select id="subjectFilter" onchange="filterDocuments()" class="px-3 py-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium">
+                        <option value="all">Mọi môn học</option>
+                        <option value="Toán học">Toán học</option>
+                        <option value="Tin học">Tin học</option>
+                        <option value="Ngữ văn">Ngữ văn</option>
+                        <option value="KHTN">Khoa học tự nhiên</option>
+                        <option value="Lịch sử - Địa lí">Lịch sử - Địa lí</option>
+                        <option value="Tiếng Anh">Tiếng Anh</option>
+                        <option value="Khác">Môn khác</option>
+                    </select>
+                </div>
+
+                <div class="text-xs text-slate-500" id="docsCountText">Đang tải tài liệu...</div>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Môn học</label>
-            <select id="docCategory" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 outline-none">
-              <option value="Toán học">📐 Toán học</option>
-              <option value="Tin học">💻 Tin học</option>
-              <option value="Ngữ văn">✍️ Ngữ văn</option>
-              <option value="Ngoại ngữ">🌐 Ngoại ngữ</option>
-              <option value="KHTN">🔬 Khoa học tự nhiên</option>
-              <option value="Sử - Địa">🌏 Lịch sử - Địa lý</option>
-              <option value="Khác">📦 Tài liệu chung</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Khối lớp</label>
-            <select id="docGrade" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 outline-none">
-              <option value="Khối 6">Khối 6</option>
-              <option value="Khối 7">Khối 7</option>
-              <option value="Khối 8">Khối 8</option>
-              <option value="Khối 9">Khối 9</option>
-              <option value="Khối 10">Khối 10</option>
-              <option value="Khối 11">Khối 11</option>
-              <option value="Khối 12">Khối 12</option>
-              <option value="Giáo viên">Giáo viên / Quản lý</option>
-            </select>
-          </div>
+        <!-- Document Grid -->
+        <div id="documentsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Tài liệu sẽ được render tự động vào đây -->
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Người đăng / Giáo viên</label>
-            <input type="text" id="docAuthor" placeholder="VD: Thầy Quang (Tổ Toán)" 
-                   class="w-full px-3.5 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Thẻ tags (cách nhau dấu phẩy)</label>
-            <input type="text" id="docTags" placeholder="on-thi, de-cuong, giua-ky" 
-                   class="w-full px-3.5 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 outline-none">
-          </div>
+        <div id="emptyState" class="hidden text-center py-16 bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
+            <i class="fa-solid fa-folder-open text-4xl text-slate-300 mb-3"></i>
+            <p class="text-sm font-medium text-slate-500">Chưa có tài liệu nào trong danh mục này.</p>
         </div>
+    </main>
 
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Ghi chú / Mô tả</label>
-          <textarea id="docDescription" rows="2" placeholder="Ghi chú thêm về nội dung, hướng dẫn giải hoặc lời dặn..." 
-                    class="w-full px-3.5 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
-        </div>
+    <!-- Upload Modal -->
+    <div id="uploadModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-4 border border-slate-200 dark:border-slate-700 shadow-2xl">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700">
+                <h3 class="font-bold text-base flex items-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-up text-blue-600"></i> Tải Lên Tài Liệu Mới
+                </h3>
+                <button onclick="closeUploadModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
 
-        <!-- Submit Controls -->
-        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-700">
-          <button type="button" id="cancelUploadBtn" class="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition">
-            Hủy
-          </button>
-          <button type="submit" id="submitUploadBtn" class="px-5 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-md transition flex items-center gap-1.5">
-            <i data-lucide="check" class="w-4 h-4"></i>
-            <span id="submitBtnText">Đăng tải lên hệ thống</span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
+            <form id="uploadForm" onsubmit="handleUpload(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Chọn tập tin (PDF, Word, Excel, PowerPoint, Ảnh...)</label>
+                    <input type="file" id="fileInput" required class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-slate-700 dark:file:text-slate-200">
+                </div>
 
-  <!-- Settings / Supabase Config Modal -->
-  <div id="settingsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
-    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-100 dark:border-slate-700 transform scale-95 transition-transform duration-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-700">
-        <div class="flex items-center gap-2">
-          <div class="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400">
-            <i data-lucide="cloud" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <h3 class="font-bold text-base text-slate-900 dark:text-white">Cấu Hình Kết Nối Supabase Cloud</h3>
-            <p class="text-[11px] text-slate-500">Đồng bộ tài liệu thời gian thực giữa tất cả các máy</p>
-          </div>
-        </div>
-        <button id="closeSettingsModalBtn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Tiêu đề tài liệu</label>
+                    <input type="text" id="docTitle" required placeholder="Ví dụ: Đề cương ôn tập Tin học 7 Giữa kì 1" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
 
-      <!-- Quick 3-Step Setup Guide Accordion -->
-      <div class="mt-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/80 text-xs">
-        <h4 class="font-bold text-slate-800 dark:text-slate-200 mb-2 flex items-center gap-1.5">
-          <i data-lucide="info" class="w-4 h-4 text-blue-500"></i> Hướng dẫn 3 bước khởi tạo miễn phí:
-        </h4>
-        <ol class="list-decimal list-inside space-y-1.5 text-slate-600 dark:text-slate-300">
-          <li>Tạo tài khoản tại <a href="https://supabase.com" target="_blank" class="text-blue-600 underline font-medium">supabase.com</a> và tạo một Project mới.</li>
-          <li>Vào <strong>SQL Editor</strong>, dán mã bên dưới rồi nhấn <strong>Run</strong>:</li>
-        </ol>
-        <div class="relative mt-2">
-          <pre class="bg-slate-900 text-slate-100 p-3 rounded-lg text-[10px] overflow-x-auto font-mono">
--- 1. Tao bang luu metadata tai lieu
-CREATE TABLE IF NOT EXISTS documents (
-  id TEXT PRIMARY KEY,
-  title TEXT NOT NULL,
-  category TEXT,
-  grade TEXT,
-  author TEXT,
-  description TEXT,
-  tags TEXT[],
-  file_url TEXT,
-  file_name TEXT,
-  file_size BIGINT,
-  file_type TEXT,
-  downloads INT DEFAULT 0,
-  likes INT DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Bat quyen doc ghi cong khai
-ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Public Access" ON documents FOR ALL USING (true) WITH CHECK (true);
-
--- 2. Tao Storage Bucket ten la documents (chon Public Bucket)
-INSERT INTO storage.buckets (id, name, public) VALUES ('documents', 'documents', true)
-ON CONFLICT (id) DO NOTHING;
-CREATE POLICY "Public Storage" ON storage.objects FOR ALL USING (bucket_id = 'documents') WITH CHECK (bucket_id = 'documents');</pre>
-          <button id="copySqlBtn" class="absolute top-2 right-2 px-2 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded text-[10px] flex items-center gap-1">
-            <i data-lucide="copy" class="w-3 h-3"></i> Sao chép SQL
-          </button>
-        </div>
-        <p class="mt-2 text-slate-500">3. Vào <strong>Project Settings -> API</strong>, sao chép <code>Project URL</code> và <code>anon public key</code> dán vào ô bên dưới:</p>
-      </div>
-
-      <!-- Config Inputs Form -->
-      <form id="settingsForm" class="mt-4 space-y-3.5">
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Supabase Project URL</label>
-          <input type="url" id="supabaseUrlInput" placeholder="https://xyzcompany.supabase.co" 
-                 class="w-full px-3.5 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Supabase Anon Public Key</label>
-          <input type="password" id="supabaseKeyInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI..." 
-                 class="w-full px-3.5 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-
-        <div class="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-700">
-          <button type="button" id="clearSettingsBtn" class="text-xs text-red-500 hover:text-red-700 font-medium">
-            Xóa cấu hình (Về Offline)
-          </button>
-          <div class="flex items-center gap-2">
-            <button type="button" id="cancelSettingsBtn" class="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition">
-              Đóng
-            </button>
-            <button type="submit" class="px-5 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-md transition flex items-center gap-1.5">
-              <i data-lucide="save" class="w-4 h-4"></i> Lưu & Kết nối
-            </button>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Document Preview Modal -->
-  <div id="previewModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/70 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
-    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-4xl w-full h-[85vh] shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden">
-      <!-- Preview Header -->
-      <div class="p-3.5 sm:p-4 bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3">
-        <div class="flex items-center gap-2.5 truncate">
-          <div id="previewModalIcon" class="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400">
-            <i data-lucide="file-text" class="w-5 h-5"></i>
-          </div>
-          <div class="truncate">
-            <h3 id="previewModalTitle" class="font-bold text-xs sm:text-base text-slate-900 dark:text-white truncate">Tên tài liệu</h3>
-            <p id="previewModalMeta" class="text-[11px] text-slate-500 dark:text-slate-400 truncate">Tác giả • Kích thước • Ngày đăng</p>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-2 shrink-0">
-          <button id="previewModalDownloadBtn" class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition">
-            <i data-lucide="download" class="w-3.5 h-3.5"></i>
-            <span class="hidden sm:inline">Tải về</span>
-          </button>
-          <button id="previewModalShareBtn" class="p-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition" title="Chia sẻ">
-            <i data-lucide="share-2" class="w-4 h-4"></i>
-          </button>
-          <button id="closePreviewModalBtn" class="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg">
-            <i data-lucide="x" class="w-5 h-5"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- Preview Body -->
-      <div id="previewModalContent" class="flex-1 bg-slate-100 dark:bg-slate-950 p-4 overflow-auto flex items-center justify-center">
-        <!-- Rendered dynamically -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Toast Notification Message -->
-  <div id="toastMessage" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-2xl border border-slate-700 dark:border-slate-200">
-    <div id="toastIcon" class="text-emerald-400 dark:text-emerald-600">
-      <i data-lucide="check-circle" class="w-5 h-5"></i>
-    </div>
-    <span id="toastText" class="text-xs sm:text-sm font-medium">Đã sao chép liên kết chia sẻ!</span>
-  </div>
-
-  <!-- Application Logic -->
-  <script>
-    // --- Application State ---
-    let supabaseClient = null;
-    let isCloudConnected = false;
-    let documents = [];
-    let currentFilterCategory = 'ALL';
-    let currentFilterGrade = 'ALL';
-    let currentFilterFormat = 'ALL';
-    let currentSearchTerm = '';
-    let currentSortBy = 'newest';
-    let currentViewMode = 'grid';
-    let onlyFavorites = false;
-    let selectedFileForUpload = null;
-    let activePreviewDoc = null;
-
-    // --- IndexedDB Fallback Config ---
-    const IDB_NAME = 'DocShareSchool_DB';
-    const IDB_VERSION = 1;
-    const IDB_STORE = 'documents';
-    let idb;
-
-    function openIndexedDB() {
-      return new Promise((resolve, reject) => {
-        const req = indexedDB.open(IDB_NAME, IDB_VERSION);
-        req.onupgradeneeded = (e) => {
-          const dbInstance = e.target.result;
-          if (!dbInstance.objectStoreNames.contains(IDB_STORE)) {
-            dbInstance.createObjectStore(IDB_STORE, { keyPath: 'id' });
-          }
-        };
-        req.onsuccess = (e) => {
-          idb = e.target.result;
-          resolve(idb);
-        };
-        req.onerror = (e) => reject(e.target.error);
-      });
-    }
-
-    function getIdbDocs() {
-      return new Promise((resolve, reject) => {
-        const tx = idb.transaction([IDB_STORE], 'readonly');
-        const req = tx.objectStore(IDB_STORE).getAll();
-        req.onsuccess = () => resolve(req.result || []);
-        req.onerror = () => reject(req.error);
-      });
-    }
-
-    function saveIdbDoc(doc) {
-      return new Promise((resolve, reject) => {
-        const tx = idb.transaction([IDB_STORE], 'readwrite');
-        const req = tx.objectStore(IDB_STORE).put(doc);
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
-      });
-    }
-
-    function deleteIdbDoc(id) {
-      return new Promise((resolve, reject) => {
-        const tx = idb.transaction([IDB_STORE], 'readwrite');
-        const req = tx.objectStore(IDB_STORE).delete(id);
-        req.onsuccess = () => resolve();
-        req.onerror = () => reject(req.error);
-      });
-    }
-
-    // --- Sample Documents for Initial Demo ---
-    const SAMPLE_DOCS = [
-      {
-        id: 'sample-1',
-        title: 'Đề Cương & Bài Tập Trọng Tâm Toán 8 Học Kỳ 1',
-        category: 'Toán học',
-        grade: 'Khối 8',
-        author: 'Thầy Trần Minh Nhật (Tổ Toán)',
-        description: 'Tổng hợp lý thuyết hằng đẳng thức đáng nhớ, phân tích đa thức và hệ thống bài tập rèn luyện nâng cao.',
-        tags: ['toan-8', 'de-cuong', 'hk1', 'hang-dang-thuc'],
-        file_type: 'pdf',
-        file_name: 'DeCuong_Toan8_HK1.pdf',
-        file_size: 2450000,
-        file_url: '',
-        contentBlob: new Blob(['%PDF-1.4\n1 0 obj\n<< /Title (De Cuong Toan 8) >>\nendobj\ntrailer\n<< /Root 1 0 R >>\n%%EOF'], { type: 'application/pdf' }),
-        created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
-        downloads: 148,
-        likes: 42,
-        isLiked: false
-      },
-      {
-        id: 'sample-2',
-        title: 'Giáo Án PowerPoint: Cú Pháp Lập Trình Python Căn Bản',
-        category: 'Tin học',
-        grade: 'Khối 10',
-        author: 'Cô Lê Thu Hà (Tổ Tin học)',
-        description: 'Bài giảng điện tử gồm các slide tương tác về biến, vòng lặp for/while và hàm trong ngôn ngữ Python.',
-        tags: ['tin-10', 'python', 'lap-trinh', 'giao-an'],
-        file_type: 'slide',
-        file_name: 'Python_CanBan_Khoi10.pptx',
-        file_size: 5120000,
-        file_url: '',
-        contentBlob: new Blob(['Python slide mock presentation'], { type: 'application/vnd.ms-powerpoint' }),
-        created_at: new Date(Date.now() - 3600000 * 48).toISOString(),
-        downloads: 215,
-        likes: 67,
-        isLiked: true
-      },
-      {
-        id: 'sample-3',
-        title: 'Tuyển Tập 50 Đề Thi HSG Môn Ngữ Văn 9 Có Lời Bình',
-        category: 'Ngữ văn',
-        grade: 'Khối 9',
-        author: 'Thầy Phạm Quang (GV Văn)',
-        description: 'Bộ tài liệu bồi dưỡng học sinh giỏi lớp 9 cấp thành phố kèm phân tích dàn ý chi tiết từng tác phẩm.',
-        tags: ['ngu-van-9', 'hsg', 'nghi-luan-xa-hoi', 'dan-y'],
-        file_type: 'word',
-        file_name: 'BoDe_HSG_NguVan9.docx',
-        file_size: 1980000,
-        file_url: '',
-        contentBlob: new Blob(['Bộ đề thi học sinh giỏi ngữ văn...'], { type: 'application/msword' }),
-        created_at: new Date(Date.now() - 3600000 * 72).toISOString(),
-        downloads: 320,
-        likes: 110,
-        isLiked: false
-      },
-      {
-        id: 'sample-4',
-        title: 'Sổ Tay Công Thức Hóa Học & Phương Trình Phản Ứng KHTN 7',
-        category: 'KHTN',
-        grade: 'Khối 7',
-        author: 'Tổ KHTN Trường THCS',
-        description: 'Bảng tuần hoàn tóm lược, hóa trị các nguyên tố thông dụng và phương trình phản ứng minh họa.',
-        tags: ['khtn-7', 'hoa-hoc', 'bang-tuan-hoan'],
-        file_type: 'text',
-        file_name: 'BangHoaTri_KHTN7.txt',
-        file_size: 28000,
-        file_url: '',
-        contentBlob: new Blob([
-`BẢNG HÓA TRỊ THƯỜNG GẶP - KHTN 7
-1. Hóa trị I: H, Na, K, Ag, Cl (trong muối clorua)
-2. Hóa trị II: O, Mg, Ca, Ba, Zn, Cu, Fe (trong hợp chất Fe II)
-3. Hóa trị III: Al, Fe (trong hợp chất Fe III)
-Nhóm nguyên tử:
-- Nhóm (OH) hóa trị I
-- Nhóm (NO3) hóa trị I
-- Nhóm (SO4) hóa trị II
-- Nhóm (CO3) hóa trị II
-- Nhóm (PO4) hóa trị III`
-        ], { type: 'text/plain' }),
-        created_at: new Date(Date.now() - 3600000 * 12).toISOString(),
-        downloads: 89,
-        likes: 31,
-        isLiked: true
-      }
-    ];
-
-    // --- Helpers ---
-    function formatBytes(bytes, decimals = 1) {
-      if (!bytes || bytes === 0) return '0 B';
-      const k = 1024;
-      const dm = decimals < 0 ? 0 : decimals;
-      const sizes = ['B', 'KB', 'MB', 'GB'];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-    }
-
-    function formatDate(dateStr) {
-      if (!dateStr) return 'Gần đây';
-      const d = new Date(dateStr);
-      return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    }
-
-    function getFileTypeInfo(type) {
-      switch (type) {
-        case 'pdf':
-          return { color: 'text-red-500 bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-900', label: 'PDF', icon: 'file-text' };
-        case 'word':
-          return { color: 'text-blue-600 bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-900', label: 'Word', icon: 'file-type-2' };
-        case 'excel':
-          return { color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900', label: 'Excel', icon: 'table' };
-        case 'slide':
-          return { color: 'text-amber-500 bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900', label: 'PowerPoint', icon: 'presentation' };
-        case 'image':
-          return { color: 'text-purple-500 bg-purple-50 dark:bg-purple-950/40 border-purple-200 dark:border-purple-900', label: 'Ảnh', icon: 'image' };
-        case 'text':
-        default:
-          return { color: 'text-slate-600 bg-slate-100 dark:bg-slate-700/60 border-slate-200 dark:border-slate-700', label: 'Văn bản', icon: 'file-code' };
-      }
-    }
-
-    function detectFileType(fileName) {
-      const ext = fileName.split('.').pop().toLowerCase();
-      if (ext === 'pdf') return 'pdf';
-      if (['doc', 'docx'].includes(ext)) return 'word';
-      if (['xls', 'xlsx', 'csv'].includes(ext)) return 'excel';
-      if (['ppt', 'pptx'].includes(ext)) return 'slide';
-      if (['png', 'jpg', 'jpeg', 'svg', 'webp'].includes(ext)) return 'image';
-      return 'text';
-    }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    }
-
-    function showToast(msg, isError = false) {
-      const toast = document.getElementById('toastMessage');
-      const toastText = document.getElementById('toastText');
-      const toastIcon = document.getElementById('toastIcon');
-
-      toastText.textContent = msg;
-      if (isError) {
-        toastIcon.className = 'text-red-400';
-        toastIcon.innerHTML = `<i data-lucide="alert-circle" class="w-5 h-5"></i>`;
-      } else {
-        toastIcon.className = 'text-emerald-400';
-        toastIcon.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5"></i>`;
-      }
-      lucide.createIcons();
-
-      toast.classList.remove('translate-y-24', 'opacity-0');
-      toast.classList.add('translate-y-0', 'opacity-100');
-      setTimeout(() => {
-        toast.classList.add('translate-y-24', 'opacity-0');
-        toast.classList.remove('translate-y-0', 'opacity-100');
-      }, 3200);
-    }
-
-    // --- Supabase Cloud Client Manager ---
-    function initSupabase() {
-      const url = localStorage.getItem('https://bgiknnbsggoadndbcpds.supabase.co');
-      const key = localStorage.getItem('sb_publishable_oMsYNHXY2soFAT6HRPO3dA_Fomn_nqE');
-
-      if (url && key && window.supabase) {
-        try {
-          supabaseClient = window.supabase.createClient(url, key);
-          isCloudConnected = true;
-          updateCloudStatusUI(true);
-          return true;
-        } catch (err) {
-          console.error('Supabase init error:', err);
-          isCloudConnected = false;
-          updateCloudStatusUI(false);
-          return false;
-        }
-      } else {
-        isCloudConnected = false;
-        updateCloudStatusUI(false);
-        return false;
-      }
-    }
-
-    function updateCloudStatusUI(connected) {
-      const dot = document.getElementById('cloudStatusDot');
-      const text = document.getElementById('cloudStatusText');
-      const banner = document.getElementById('offlineNoticeBanner');
-      const targetBadge = document.getElementById('uploadTargetBadge');
-
-      if (connected) {
-        dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
-        text.textContent = 'Supabase Online';
-        banner.classList.add('hidden');
-        targetBadge.textContent = 'Lưu trữ đám mây (Supabase Storage)';
-        targetBadge.className = 'text-[11px] text-emerald-600 dark:text-emerald-400 font-medium';
-      } else {
-        dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse';
-        text.textContent = 'Offline Demo';
-        banner.classList.remove('hidden');
-        targetBadge.textContent = 'Đang lưu nội bộ máy (Chưa cấu hình Cloud)';
-        targetBadge.className = 'text-[11px] text-amber-600 dark:text-amber-400 font-medium';
-      }
-    }
-
-    // --- Data Fetching & Sync ---
-    async function loadDocuments() {
-      const spinner = document.getElementById('loadingSpinner');
-      spinner.classList.remove('hidden');
-      spinner.classList.add('flex');
-
-      try {
-        if (isCloudConnected && supabaseClient) {
-          // Fetch from Supabase Table
-          const { data, error } = await supabaseClient
-            .from('documents')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-          if (error) throw error;
-          documents = (data || []).map(doc => ({
-            ...doc,
-            fileType: doc.file_type,
-            fileName: doc.file_name,
-            fileSize: doc.file_size,
-            fileUrl: doc.file_url,
-            createdAt: doc.created_at
-          }));
-        } else {
-          // Fetch from IndexedDB
-          await openIndexedDB();
-          const localDocs = await getIdbDocs();
-          if (localDocs.length === 0) {
-            for (const item of SAMPLE_DOCS) {
-              await saveIdbDoc(item);
-            }
-            documents = [...SAMPLE_DOCS];
-          } else {
-            documents = localDocs.map(d => ({
-              ...d,
-              fileType: d.file_type || d.fileType,
-              fileName: d.file_name || d.fileName,
-              fileSize: d.file_size || d.fileSize,
-              fileUrl: d.file_url || d.fileUrl,
-              createdAt: d.created_at || d.createdAt
-            }));
-          }
-        }
-      } catch (err) {
-        console.error('Error fetching docs:', err);
-        showToast('Không thể tải từ máy chủ, chuyển sang chế độ nội bộ', true);
-        // Fallback to local
-        const localDocs = await getIdbDocs();
-        documents = localDocs.length > 0 ? localDocs : SAMPLE_DOCS;
-      } finally {
-        spinner.classList.add('hidden');
-        spinner.classList.remove('flex');
-        updateStats();
-        renderDocuments();
-      }
-    }
-
-    // --- Render Documents ---
-    function filterAndSortDocuments() {
-      return documents.filter(doc => {
-        // Category Filter
-        if (currentFilterCategory !== 'ALL' && doc.category !== currentFilterCategory) {
-          return false;
-        }
-
-        // Grade Filter
-        if (currentFilterGrade !== 'ALL' && doc.grade !== currentFilterGrade) {
-          return false;
-        }
-
-        // Format Filter
-        const docFormat = doc.fileType || doc.file_type;
-        if (currentFilterFormat !== 'ALL' && docFormat !== currentFilterFormat) {
-          return false;
-        }
-
-        // Favorites Filter
-        if (onlyFavorites && !doc.isLiked) {
-          return false;
-        }
-
-        // Search Term
-        if (currentSearchTerm.trim()) {
-          const t = currentSearchTerm.toLowerCase();
-          const title = (doc.title || '').toLowerCase();
-          const author = (doc.author || '').toLowerCase();
-          const desc = (doc.description || '').toLowerCase();
-          const fileName = (doc.fileName || doc.file_name || '').toLowerCase();
-          const tags = Array.isArray(doc.tags) ? doc.tags.join(' ').toLowerCase() : '';
-
-          if (!title.includes(t) && !author.includes(t) && !desc.includes(t) && !fileName.includes(t) && !tags.includes(t)) {
-            return false;
-          }
-        }
-
-        return true;
-      }).sort((a, b) => {
-        if (currentSortBy === 'popular') {
-          return (b.downloads || 0) - (a.downloads || 0);
-        } else if (currentSortBy === 'title') {
-          return (a.title || '').localeCompare(b.title || '');
-        } else {
-          return new Date(b.createdAt || b.created_at) - new Date(a.createdAt || a.created_at);
-        }
-      });
-    }
-
-    function renderDocuments() {
-      const filtered = filterAndSortDocuments();
-      const grid = document.getElementById('documentsGrid');
-      const tableWrapper = document.getElementById('documentsTableWrapper');
-      const tableBody = document.getElementById('documentsTableBody');
-      const emptyState = document.getElementById('emptyState');
-
-      if (filtered.length === 0) {
-        emptyState.classList.remove('hidden');
-        emptyState.classList.add('flex');
-        grid.classList.add('hidden');
-        tableWrapper.classList.add('hidden');
-        lucide.createIcons();
-        return;
-      }
-
-      emptyState.classList.add('hidden');
-      emptyState.classList.remove('flex');
-
-      if (currentViewMode === 'grid') {
-        grid.classList.remove('hidden');
-        tableWrapper.classList.add('hidden');
-
-        grid.innerHTML = filtered.map(doc => {
-          const format = doc.fileType || doc.file_type || 'text';
-          const typeInfo = getFileTypeInfo(format);
-          const tags = Array.isArray(doc.tags) ? doc.tags : [];
-          const tagsHtml = tags.slice(0, 3).map(tag => 
-            `<span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300">#${escapeHtml(tag)}</span>`
-          ).join('');
-
-          return `
-            <div class="group bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700/80 hover:shadow-lg transition-all duration-200 flex flex-col justify-between hover:-translate-y-0.5">
-              <div>
-                <!-- Top Row -->
-                <div class="flex items-start justify-between gap-2 mb-3">
-                  <div class="flex items-center gap-2">
-                    <div class="p-2.5 rounded-xl ${typeInfo.color} flex items-center justify-center shrink-0">
-                      <i data-lucide="${typeInfo.icon}" class="w-5 h-5"></i>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Khối lớp</label>
+                        <select id="docGrade" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="Khối 6">Khối 6</option>
+                            <option value="Khối 7">Khối 7</option>
+                            <option value="Khối 8">Khối 8</option>
+                            <option value="Khối 9">Khối 9</option>
+                            <option value="Chung">Dùng chung</option>
+                        </select>
                     </div>
                     <div>
-                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
-                        ${escapeHtml(doc.category || 'Tài liệu')}
-                      </span>
-                      ${doc.grade ? `<span class="ml-1 text-[10px] font-medium text-slate-500">${escapeHtml(doc.grade)}</span>` : ''}
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Môn học</label>
+                        <select id="docSubject" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="Tin học">Tin học</option>
+                            <option value="Toán học">Toán học</option>
+                            <option value="Ngữ văn">Ngữ văn</option>
+                            <option value="KHTN">KHTN</option>
+                            <option value="Lịch sử - Địa lí">Lịch sử - Địa lí</option>
+                            <option value="Tiếng Anh">Tiếng Anh</option>
+                            <option value="Khác">Khác</option>
+                        </select>
                     </div>
-                  </div>
-
-                  <div class="flex items-center gap-0.5">
-                    <button onclick="toggleLike('${doc.id}')" title="Yêu thích" class="p-1.5 rounded-lg text-slate-400 hover:text-red-500 transition ${doc.isLiked ? 'text-red-500 fill-red-500' : ''}">
-                      <i data-lucide="heart" class="w-4 h-4 ${doc.isLiked ? 'fill-current' : ''}"></i>
-                    </button>
-                    <button onclick="copyShareLink('${doc.id}')" title="Sao chép link chia sẻ" class="p-1.5 rounded-lg text-slate-400 hover:text-blue-500 transition">
-                      <i data-lucide="share-2" class="w-4 h-4"></i>
-                    </button>
-                    <button onclick="removeDocument('${doc.id}')" title="Xóa" class="p-1.5 rounded-lg text-slate-300 dark:text-slate-600 hover:text-red-500 transition opacity-0 group-hover:opacity-100">
-                      <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    </button>
-                  </div>
                 </div>
 
-                <!-- Title & Description -->
-                <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100 line-clamp-2 leading-snug cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition" onclick="openPreviewModal('${doc.id}')">
-                  ${escapeHtml(doc.title)}
-                </h4>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
-                  ${escapeHtml(doc.description || 'Không có mô tả chi tiết')}
-                </p>
-
-                <!-- Tags -->
-                <div class="flex flex-wrap items-center gap-1.5 mt-3">
-                  ${tagsHtml}
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Người đăng</label>
+                    <input type="text" id="docAuthor" placeholder="Thầy/Cô hoặc Tên người đăng" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
-              </div>
 
-              <!-- Footer Meta & Actions -->
-              <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[11px] text-slate-400">
-                <div class="truncate max-w-[110px] font-medium text-slate-600 dark:text-slate-300">
-                  ${escapeHtml(doc.author || 'Tổ bộ môn')}
+                <div class="pt-3 flex justify-end gap-2">
+                    <button type="button" onclick="closeUploadModal()" class="px-4 py-2 rounded-lg text-xs text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700">Hủy</button>
+                    <button type="submit" id="btnSubmitUpload" class="px-5 py-2 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20">Tải lên ngay</button>
                 </div>
-                
-                <div class="flex items-center gap-1.5">
-                  <button onclick="openPreviewModal('${doc.id}')" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-medium transition flex items-center gap-1">
-                    <i data-lucide="eye" class="w-3 h-3"></i> Xem
-                  </button>
-                  <button onclick="downloadDoc('${doc.id}')" class="px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-600 hover:text-white text-blue-600 dark:text-blue-300 font-medium transition flex items-center gap-1">
-                    <i data-lucide="download" class="w-3 h-3"></i> Tải
-                  </button>
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('');
-      } else {
-        grid.classList.add('hidden');
-        tableWrapper.classList.remove('hidden');
-
-        tableBody.innerHTML = filtered.map(doc => {
-          const format = doc.fileType || doc.file_type || 'text';
-          const typeInfo = getFileTypeInfo(format);
-
-          return `
-            <tr class="hover:bg-slate-50 dark:hover:bg-slate-750 transition">
-              <td class="py-3 px-4">
-                <div class="flex items-center gap-3">
-                  <div class="p-2 rounded-lg ${typeInfo.color} shrink-0">
-                    <i data-lucide="${typeInfo.icon}" class="w-4 h-4"></i>
-                  </div>
-                  <div class="truncate max-w-xs cursor-pointer" onclick="openPreviewModal('${doc.id}')">
-                    <p class="font-semibold text-xs text-slate-800 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 truncate">${escapeHtml(doc.title)}</p>
-                    <p class="text-[11px] text-slate-400 truncate">${escapeHtml(doc.fileName || doc.file_name || doc.title)}</p>
-                  </div>
-                </div>
-              </td>
-              <td class="py-3 px-3 text-xs">
-                <span class="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 font-medium text-slate-600 dark:text-slate-300">
-                  ${escapeHtml(doc.category || 'Chung')}
-                </span>
-              </td>
-              <td class="py-3 px-3 text-xs text-slate-600 dark:text-slate-300 whitespace-nowrap">
-                ${escapeHtml(doc.grade || '-')}
-              </td>
-              <td class="py-3 px-3 text-xs text-slate-600 dark:text-slate-300 font-medium truncate max-w-[120px]">
-                ${escapeHtml(doc.author || 'Ẩn danh')}
-              </td>
-              <td class="py-3 px-3 text-xs text-slate-500 whitespace-nowrap">
-                ${formatBytes(doc.fileSize || doc.file_size)}
-              </td>
-              <td class="py-3 px-3 text-xs text-slate-500 whitespace-nowrap">
-                ${formatDate(doc.createdAt || doc.created_at)}
-              </td>
-              <td class="py-3 px-3 text-xs text-center text-slate-500 whitespace-nowrap">
-                <div class="flex items-center justify-center gap-2">
-                  <span class="flex items-center gap-0.5"><i data-lucide="download" class="w-3 h-3 text-slate-400"></i> ${doc.downloads || 0}</span>
-                  <span class="flex items-center gap-0.5"><i data-lucide="heart" class="w-3 h-3 text-red-400"></i> ${doc.likes || 0}</span>
-                </div>
-              </td>
-              <td class="py-3 px-4 text-right whitespace-nowrap">
-                <div class="flex items-center justify-end gap-1">
-                  <button onclick="toggleLike('${doc.id}')" title="Yêu thích" class="p-1 rounded-md text-slate-400 hover:text-red-500 ${doc.isLiked ? 'text-red-500 fill-red-500' : ''}">
-                    <i data-lucide="heart" class="w-4 h-4 ${doc.isLiked ? 'fill-current' : ''}"></i>
-                  </button>
-                  <button onclick="openPreviewModal('${doc.id}')" title="Xem trước" class="p-1 rounded-md text-slate-400 hover:text-blue-500">
-                    <i data-lucide="eye" class="w-4 h-4"></i>
-                  </button>
-                  <button onclick="downloadDoc('${doc.id}')" title="Tải xuống" class="p-1 rounded-md text-slate-400 hover:text-blue-500">
-                    <i data-lucide="download" class="w-4 h-4"></i>
-                  </button>
-                  <button onclick="copyShareLink('${doc.id}')" title="Chia sẻ" class="p-1 rounded-md text-slate-400 hover:text-blue-500">
-                    <i data-lucide="share-2" class="w-4 h-4"></i>
-                  </button>
-                  <button onclick="removeDocument('${doc.id}')" title="Xóa" class="p-1 rounded-md text-slate-300 dark:text-slate-600 hover:text-red-500">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          `;
-        }).join('');
-      }
-
-      lucide.createIcons();
-    }
-
-    function updateStats() {
-      const totalDocs = documents.length;
-      const totalDownloads = documents.reduce((acc, curr) => acc + (curr.downloads || 0), 0);
-      const totalLikes = documents.reduce((acc, curr) => acc + (curr.likes || 0), 0);
-
-      document.getElementById('statTotalDocs').textContent = totalDocs;
-      document.getElementById('statTotalDownloads').textContent = totalDownloads;
-      document.getElementById('statTotalLikes').textContent = totalLikes;
-    }
-
-    // --- Upload Logic (Supabase Storage / IndexedDB Fallback) ---
-    async function handleUploadSubmit(e) {
-      e.preventDefault();
-
-      const title = document.getElementById('docTitle').value.trim();
-      const category = document.getElementById('docCategory').value;
-      const grade = document.getElementById('docGrade').value;
-      const author = document.getElementById('docAuthor').value.trim() || 'Giáo viên DocShare';
-      const description = document.getElementById('docDescription').value.trim();
-      const rawTags = document.getElementById('docTags').value;
-      const tags = rawTags.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
-
-      const submitBtn = document.getElementById('submitUploadBtn');
-      const submitText = document.getElementById('submitBtnText');
-
-      if (!title) {
-        showToast('Vui lòng nhập tiêu đề tài liệu', true);
-        return;
-      }
-
-      submitBtn.disabled = true;
-      submitText.textContent = 'Đang tải lên...';
-
-      let fileType = 'text';
-      let fileName = title + '.txt';
-      let fileSize = 1024;
-      let fileUrl = '';
-      let contentBlob = null;
-
-      if (selectedFileForUpload) {
-        fileType = detectFileType(selectedFileForUpload.name);
-        fileName = selectedFileForUpload.name;
-        fileSize = selectedFileForUpload.size;
-        contentBlob = selectedFileForUpload;
-      } else {
-        contentBlob = new Blob([description || title], { type: 'text/plain' });
-      }
-
-      const docId = 'doc-' + Date.now();
-
-      try {
-        if (isCloudConnected && supabaseClient) {
-          // 1. Upload to Supabase Storage Bucket ('documents')
-          if (selectedFileForUpload) {
-            const cleanFileName = `${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-            const { data: storageData, error: storageErr } = await supabaseClient.storage
-              .from('documents')
-              .upload(cleanFileName, selectedFileForUpload, {
-                cacheControl: '3600',
-                upsert: true
-              });
-
-            if (storageErr) {
-              console.warn('Storage upload warning:', storageErr.message);
-            } else {
-              const { data: pubData } = supabaseClient.storage.from('documents').getPublicUrl(cleanFileName);
-              fileUrl = pubData.publicUrl;
-            }
-          }
-
-          // 2. Insert record into Supabase Database ('documents' table)
-          const newCloudRecord = {
-            id: docId,
-            title,
-            category,
-            grade,
-            author,
-            description,
-            tags,
-            file_url: fileUrl,
-            file_name: fileName,
-            file_size: fileSize,
-            file_type: fileType,
-            downloads: 0,
-            likes: 0,
-            created_at: new Date().toISOString()
-          };
-
-          const { error: dbErr } = await supabaseClient.from('documents').insert([newCloudRecord]);
-          if (dbErr) throw dbErr;
-
-          documents.unshift({
-            ...newCloudRecord,
-            fileType,
-            fileName,
-            fileSize,
-            fileUrl,
-            createdAt: newCloudRecord.created_at,
-            contentBlob
-          });
-
-          showToast(`Đã đồng bộ lên Supabase Cloud: "${title}"`);
-        } else {
-          // Local IndexedDB Fallback
-          const localRecord = {
-            id: docId,
-            title,
-            category,
-            grade,
-            author,
-            description,
-            tags,
-            file_type: fileType,
-            file_name: fileName,
-            file_size: fileSize,
-            file_url: '',
-            contentBlob,
-            downloads: 0,
-            likes: 0,
-            created_at: new Date().toISOString()
-          };
-
-          await saveIdbDoc(localRecord);
-          documents.unshift({
-            ...localRecord,
-            fileType,
-            fileName,
-            fileSize,
-            fileUrl: '',
-            createdAt: localRecord.created_at
-          });
-
-          showToast(`Đã lưu nội bộ thành công: "${title}"`);
-        }
-
-        updateStats();
-        renderDocuments();
-        closeUploadModal();
-        document.getElementById('uploadForm').reset();
-        selectedFileForUpload = null;
-        document.getElementById('selectedFileInfo').classList.add('hidden');
-      } catch (err) {
-        console.error('Upload Error:', err);
-        showToast('Lỗi tải lên: ' + (err.message || 'Không thể kết nối'), true);
-      } finally {
-        submitBtn.disabled = false;
-        submitText.textContent = 'Đăng tải lên hệ thống';
-      }
-    }
-
-    // --- Action Handlers ---
-    async function toggleLike(docId) {
-      const doc = documents.find(d => d.id === docId);
-      if (!doc) return;
-
-      doc.isLiked = !doc.isLiked;
-      doc.likes = (doc.likes || 0) + (doc.isLiked ? 1 : -1);
-
-      if (isCloudConnected && supabaseClient) {
-        supabaseClient.from('documents').update({ likes: doc.likes }).eq('id', docId).then();
-      } else {
-        saveIdbDoc(doc).then();
-      }
-
-      updateStats();
-      renderDocuments();
-    }
-
-    async function downloadDoc(docId) {
-      const doc = documents.find(d => d.id === docId);
-      if (!doc) return;
-
-      doc.downloads = (doc.downloads || 0) + 1;
-
-      if (isCloudConnected && supabaseClient) {
-        supabaseClient.from('documents').update({ downloads: doc.downloads }).eq('id', docId).then();
-      } else {
-        saveIdbDoc(doc).then();
-      }
-
-      updateStats();
-      renderDocuments();
-
-      if (doc.fileUrl || doc.file_url) {
-        const link = document.createElement('a');
-        link.href = doc.fileUrl || doc.file_url;
-        link.download = doc.fileName || doc.file_name || 'document';
-        link.target = '_blank';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } else if (doc.contentBlob) {
-        const url = URL.createObjectURL(doc.contentBlob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = doc.fileName || doc.file_name || `${doc.title}.${doc.fileType || 'txt'}`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } else {
-        const fakeData = 'data:text/plain;charset=utf-8,' + encodeURIComponent(doc.description || doc.title);
-        const link = document.createElement('a');
-        link.href = fakeData;
-        link.download = `${doc.title}.txt`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
-
-      showToast(`Đang tải xuống: ${doc.title}`);
-    }
-
-    async function removeDocument(docId) {
-      const doc = documents.find(d => d.id === docId);
-      if (!doc) return;
-
-      if (isCloudConnected && supabaseClient) {
-        const { error } = await supabaseClient.from('documents').delete().eq('id', docId);
-        if (error) {
-          showToast('Lỗi xóa trên Cloud: ' + error.message, true);
-          return;
-        }
-      } else {
-        await deleteIdbDoc(docId);
-      }
-
-      documents = documents.filter(d => d.id !== docId);
-      updateStats();
-      renderDocuments();
-      showToast(`Đã xóa tài liệu: ${doc.title}`);
-    }
-
-    function copyShareLink(docId) {
-      const doc = documents.find(d => d.id === docId);
-      const fakeUrl = `${window.location.origin}${window.location.pathname}?doc=${encodeURIComponent(docId)}`;
-      
-      const tempInput = document.createElement('input');
-      tempInput.value = fakeUrl;
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      document.execCommand('copy');
-      document.body.removeChild(tempInput);
-
-      showToast(`Đã sao chép link chia sẻ cho "${doc ? doc.title : 'tài liệu'}"!`);
-    }
-
-    // --- Preview Modal ---
-    function openPreviewModal(docId) {
-      const doc = documents.find(d => d.id === docId);
-      if (!doc) return;
-      activePreviewDoc = doc;
-
-      const modal = document.getElementById('previewModal');
-      const titleElem = document.getElementById('previewModalTitle');
-      const metaElem = document.getElementById('previewModalMeta');
-      const contentElem = document.getElementById('previewModalContent');
-      const iconElem = document.getElementById('previewModalIcon');
-
-      titleElem.textContent = doc.title;
-      metaElem.textContent = `${doc.author || 'Tác giả'} • ${formatBytes(doc.fileSize || doc.file_size)} • ${doc.grade || ''}`;
-
-      const format = doc.fileType || doc.file_type || 'text';
-      const typeInfo = getFileTypeInfo(format);
-      iconElem.className = `p-2 rounded-lg ${typeInfo.color}`;
-      iconElem.innerHTML = `<i data-lucide="${typeInfo.icon}" class="w-5 h-5"></i>`;
-
-      contentElem.innerHTML = '';
-
-      const targetUrl = doc.fileUrl || doc.file_url;
-
-      if (format === 'image') {
-        const src = targetUrl || (doc.contentBlob ? URL.createObjectURL(doc.contentBlob) : '');
-        contentElem.innerHTML = `
-          <div class="h-full w-full flex items-center justify-center p-2">
-            <img src="${src}" alt="${doc.title}" class="max-h-full max-w-full object-contain rounded-lg shadow-md">
-          </div>
-        `;
-      } else if (format === 'pdf') {
-        const src = targetUrl || (doc.contentBlob ? URL.createObjectURL(doc.contentBlob) : '');
-        if (src) {
-          contentElem.innerHTML = `
-            <iframe src="${src}" class="w-full h-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white"></iframe>
-          `;
-        } else {
-          showGenericPreviewPlaceholder(contentElem, doc, typeInfo);
-        }
-      } else if (format === 'text') {
-        if (doc.contentBlob instanceof Blob) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            contentElem.innerHTML = `
-              <div class="w-full h-full p-4 bg-white dark:bg-slate-900 rounded-xl overflow-auto text-xs font-mono whitespace-pre leading-relaxed border border-slate-200 dark:border-slate-800">
-                ${escapeHtml(e.target.result)}
-              </div>
-            `;
-          };
-          reader.readAsText(doc.contentBlob);
-        } else {
-          contentElem.innerHTML = `
-            <div class="w-full h-full p-4 bg-white dark:bg-slate-900 rounded-xl overflow-auto text-xs font-mono whitespace-pre leading-relaxed border border-slate-200 dark:border-slate-800">
-              ${escapeHtml(doc.description || 'Không có bản xem trước văn bản.')}
-            </div>
-          `;
-        }
-      } else {
-        showGenericPreviewPlaceholder(contentElem, doc, typeInfo);
-      }
-
-      modal.classList.remove('hidden');
-      requestAnimationFrame(() => {
-        modal.classList.remove('opacity-0');
-        modal.querySelector('.bg-white, .dark\\:bg-slate-800').classList.remove('scale-95');
-      });
-      lucide.createIcons();
-    }
-
-    function showGenericPreviewPlaceholder(container, doc, typeInfo) {
-      container.innerHTML = `
-        <div class="max-w-md w-full bg-white dark:bg-slate-900 p-8 rounded-2xl text-center shadow-lg border border-slate-200 dark:border-slate-800">
-          <div class="w-16 h-16 mx-auto mb-4 rounded-2xl ${typeInfo.color} flex items-center justify-center">
-            <i data-lucide="${typeInfo.icon}" class="w-8 h-8"></i>
-          </div>
-          <h4 class="text-base font-bold text-slate-800 dark:text-slate-100">${escapeHtml(doc.fileName || doc.file_name || doc.title)}</h4>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">
-            Định dạng <span class="font-semibold uppercase">${doc.fileType || doc.file_type}</span> cần phần mềm chuyên dụng (Office, Adobe...) để đọc chi tiết trên máy tính.
-          </p>
-          <div class="mt-6 flex justify-center">
-            <button onclick="downloadDoc('${doc.id}')" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow transition flex items-center gap-2">
-              <i data-lucide="download" class="w-4 h-4"></i>
-              Tải file về máy
-            </button>
-          </div>
+            </form>
         </div>
-      `;
-    }
+    </div>
 
-    function closePreviewModal() {
-      const modal = document.getElementById('previewModal');
-      modal.classList.add('opacity-0');
-      setTimeout(() => {
-        modal.classList.add('hidden');
-        activePreviewDoc = null;
-      }, 200);
-    }
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50"></div>
 
-    // --- Modal Toggles ---
-    function openUploadModal() {
-      const modal = document.getElementById('uploadModal');
-      modal.classList.remove('hidden');
-      requestAnimationFrame(() => {
-        modal.classList.remove('opacity-0');
-        modal.querySelector('.bg-white, .dark\\:bg-slate-800').classList.remove('scale-95');
-      });
-      lucide.createIcons();
-    }
+    <script>
+        // CẤU HÌNH TRỰC TIẾP DỰ ÁN SUPABASE CỦA BẠN TẠI ĐÂY
+        const SUPABASE_URL = 'https://bgiknnbsggoadndbcpds.supabase.co';
+        // Dán Publishable Key bạn vừa copy ở trang Supabase Settings vào giữa dấu nháy bên dưới:
+        const SUPABASE_KEY = 'sb_publishable_oMsYNHXY2soFAT6HRPO3dA_Fomn_nqE';
 
-    function closeUploadModal() {
-      const modal = document.getElementById('uploadModal');
-      modal.classList.add('opacity-0');
-      setTimeout(() => modal.classList.add('hidden'), 200);
-    }
+        let supabase = null;
+        let allDocuments = [];
 
-    function openSettingsModal() {
-      document.getElementById('supabaseUrlInput').value = localStorage.getItem('docshare_sb_url') || '';
-      document.getElementById('supabaseKeyInput').value = localStorage.getItem('docshare_sb_key') || '';
-
-      const modal = document.getElementById('settingsModal');
-      modal.classList.remove('hidden');
-      requestAnimationFrame(() => {
-        modal.classList.remove('opacity-0');
-        modal.querySelector('.bg-white, .dark\\:bg-slate-800').classList.remove('scale-95');
-      });
-      lucide.createIcons();
-    }
-
-    function closeSettingsModal() {
-      const modal = document.getElementById('settingsModal');
-      modal.classList.add('opacity-0');
-      setTimeout(() => modal.classList.add('hidden'), 200);
-    }
-
-    // --- Event Listeners Setup ---
-    function setupEventListeners() {
-      // Modals
-      document.getElementById('openUploadModalBtn').addEventListener('click', openUploadModal);
-      document.getElementById('closeUploadModalBtn').addEventListener('click', closeUploadModal);
-      document.getElementById('cancelUploadBtn').addEventListener('click', closeUploadModal);
-
-      document.getElementById('openSettingsBtn').addEventListener('click', openSettingsModal);
-      document.getElementById('cloudStatusBtn').addEventListener('click', openSettingsModal);
-      document.getElementById('closeSettingsModalBtn').addEventListener('click', closeSettingsModal);
-      document.getElementById('cancelSettingsBtn').addEventListener('click', closeSettingsModal);
-
-      document.getElementById('closePreviewModalBtn').addEventListener('click', closePreviewModal);
-
-      document.getElementById('previewModalDownloadBtn').addEventListener('click', () => {
-        if (activePreviewDoc) downloadDoc(activePreviewDoc.id);
-      });
-      document.getElementById('previewModalShareBtn').addEventListener('click', () => {
-        if (activePreviewDoc) copyShareLink(activePreviewDoc.id);
-      });
-
-      // Settings Save Form
-      document.getElementById('settingsForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const url = document.getElementById('supabaseUrlInput').value.trim();
-        const key = document.getElementById('supabaseKeyInput').value.trim();
-
-        if (url && key) {
-          localStorage.setItem('docshare_sb_url', url);
-          localStorage.setItem('docshare_sb_key', key);
-          showToast('Đã lưu thông tin Supabase! Đang kết nối...');
-          closeSettingsModal();
-          initSupabase();
-          loadDocuments();
-        } else {
-          showToast('Vui lòng điền đủ URL và Key', true);
+        // Khởi tạo Supabase
+        try {
+            if (window.supabase && SUPABASE_KEY && !SUPABASE_KEY.includes('YOUR_ACTUAL_KEY')) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            }
+        } catch (e) {
+            console.error("Lỗi kết nối Supabase:", e);
         }
-      });
 
-      // Clear Settings
-      document.getElementById('clearSettingsBtn').addEventListener('click', () => {
-        localStorage.removeItem('docshare_sb_url');
-        localStorage.removeItem('docshare_sb_key');
-        supabaseClient = null;
-        isCloudConnected = false;
-        updateCloudStatusUI(false);
-        closeSettingsModal();
-        showToast('Đã xóa thông tin Supabase, chuyển về chế độ Offline');
-        loadDocuments();
-      });
+        async function fetchDocuments() {
+            if (!supabase) {
+                // Dữ liệu mẫu hiển thị sẵn nếu chưa kết nối
+                allDocuments = [
+                    { id: '1', title: 'Đề cương ôn tập Tin học 7 Giữa kì 1', grade: 'Khối 7', subject: 'Tin học', author: 'Tổ Tin Học', file_name: 'De-cuong-tin-7.pdf', file_url: '#', created_at: new Date().toISOString() },
+                    { id: '2', title: 'Bài tập Đại số 8 Chuyên đề phân thức', grade: 'Khối 8', subject: 'Toán học', author: 'Thầy Tuấn', file_name: 'Toan-8-Phan-thuc.docx', file_url: '#', created_at: new Date().toISOString() }
+                ];
+                renderDocuments(allDocuments);
+                return;
+            }
 
-      // Copy SQL Helper
-      document.getElementById('copySqlBtn').addEventListener('click', () => {
-        const sql = `CREATE TABLE IF NOT EXISTS documents (
-  id TEXT PRIMARY KEY,
-  title TEXT NOT NULL,
-  category TEXT,
-  grade TEXT,
-  author TEXT,
-  description TEXT,
-  tags TEXT[],
-  file_url TEXT,
-  file_name TEXT,
-  file_size BIGINT,
-  file_type TEXT,
-  downloads INT DEFAULT 0,
-  likes INT DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Public Access" ON documents FOR ALL USING (true) WITH CHECK (true);
-INSERT INTO storage.buckets (id, name, public) VALUES ('documents', 'documents', true) ON CONFLICT (id) DO NOTHING;
-CREATE POLICY "Public Storage" ON storage.objects FOR ALL USING (bucket_id = 'documents') WITH CHECK (bucket_id = 'documents');`;
-        
-        const temp = document.createElement('textarea');
-        temp.value = sql;
-        document.body.appendChild(temp);
-        temp.select();
-        document.execCommand('copy');
-        document.body.removeChild(temp);
-        showToast('Đã sao chép mã lệnh SQL Supabase!');
-      });
-
-      // Upload Drag & Drop & Form
-      const dropZone = document.getElementById('dropZone');
-      const fileInput = document.getElementById('fileInput');
-      const selectedFileInfo = document.getElementById('selectedFileInfo');
-      const selectedFileName = document.getElementById('selectedFileName');
-      const selectedFileSize = document.getElementById('selectedFileSize');
-
-      dropZone.addEventListener('click', () => fileInput.click());
-
-      dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropZone.classList.add('border-blue-500', 'bg-blue-50/50');
-      });
-
-      ['dragleave', 'dragend'].forEach(type => {
-        dropZone.addEventListener(type, () => {
-          dropZone.classList.remove('border-blue-500', 'bg-blue-50/50');
-        });
-      });
-
-      dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('border-blue-500', 'bg-blue-50/50');
-        if (e.dataTransfer.files.length > 0) {
-          handleFilePick(e.dataTransfer.files[0]);
+            try {
+                const { data, error } = await supabase.from('documents').select('*').order('created_at', { ascending: false });
+                if (error) throw error;
+                allDocuments = data || [];
+                renderDocuments(allDocuments);
+            } catch (err) {
+                console.error("Lỗi tải tài liệu:", err);
+                showToast("Không thể tải danh sách tài liệu từ đám mây.", true);
+            }
         }
-      });
 
-      fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length > 0) {
-          handleFilePick(e.target.files[0]);
+        function renderDocuments(docs) {
+            const container = document.getElementById('documentsContainer');
+            const emptyState = document.getElementById('emptyState');
+            document.getElementById('docsCountText').innerText = `Hiển thị ${docs.length} tài liệu`;
+
+            if (docs.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            container.innerHTML = docs.map(doc => `
+                <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900">${doc.subject || 'Môn học'}</span>
+                            <span class="text-[11px] text-slate-400">${doc.grade || 'Chung'}</span>
+                        </div>
+                        <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100 line-clamp-2 mb-1.5" title="${doc.title}">${doc.title}</h4>
+                        <p class="text-xs text-slate-400 mb-3"><i class="fa-solid fa-user-pen mr-1"></i>${doc.author || 'Ẩn danh'}</p>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
+                        <span class="text-[11px] text-slate-400 truncate max-w-[150px]"><i class="fa-regular fa-file mr-1"></i>${doc.file_name || 'Tài liệu'}</span>
+                        <a href="${doc.file_url}" target="_blank" download class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm transition">
+                            <i class="fa-solid fa-download text-[11px]"></i> Tải về
+                        </a>
+                    </div>
+                </div>
+            `).join('');
         }
-      });
 
-      function handleFilePick(file) {
-        selectedFileForUpload = file;
-        selectedFileName.textContent = file.name;
-        selectedFileSize.textContent = formatBytes(file.size);
-        selectedFileInfo.classList.remove('hidden');
+        function filterDocuments() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const grade = document.getElementById('gradeFilter').value;
+            const subject = document.getElementById('subjectFilter').value;
 
-        const titleInput = document.getElementById('docTitle');
-        if (!titleInput.value.trim()) {
-          const rawName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
-          titleInput.value = rawName.replace(/[_-]/g, ' ');
+            const filtered = allDocuments.filter(doc => {
+                const matchQuery = (doc.title || '').toLowerCase().includes(query) || (doc.author || '').toLowerCase().includes(query);
+                const matchGrade = grade === 'all' || doc.grade === grade;
+                const matchSubject = subject === 'all' || doc.subject === subject;
+                return matchQuery && matchGrade && matchSubject;
+            });
+
+            renderDocuments(filtered);
         }
-        lucide.createIcons();
-      }
 
-      document.getElementById('uploadForm').addEventListener('submit', handleUploadSubmit);
+        async function handleUpload(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (!file) return;
 
-      // Search Inputs
-      const searchInput = document.getElementById('globalSearchInput');
-      const mobileSearchInput = document.getElementById('mobileSearchInput');
+            const btn = document.getElementById('btnSubmitUpload');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-1"></i> Đang tải...';
 
-      const onSearch = (v) => {
-        currentSearchTerm = v;
-        renderDocuments();
-      };
+            const title = document.getElementById('docTitle').value;
+            const grade = document.getElementById('docGrade').value;
+            const subject = document.getElementById('docSubject').value;
+            const author = document.getElementById('docAuthor').value || 'Giáo viên';
 
-      searchInput.addEventListener('input', (e) => {
-        mobileSearchInput.value = e.target.value;
-        onSearch(e.target.value);
-      });
+            if (!supabase) {
+                // Chế độ demo
+                allDocuments.unshift({
+                    id: Date.now().toString(),
+                    title, grade, subject, author,
+                    file_name: file.name,
+                    file_url: URL.createObjectURL(file),
+                    created_at: new Date().toISOString()
+                });
+                renderDocuments(allDocuments);
+                closeUploadModal();
+                showToast("Đã thêm tài liệu thành công!");
+                btn.disabled = false;
+                btn.innerText = 'Tải lên ngay';
+                return;
+            }
 
-      mobileSearchInput.addEventListener('input', (e) => {
-        searchInput.value = e.target.value;
-        onSearch(e.target.value);
-      });
+            try {
+                // Tải file lên Supabase Storage
+                const fileExt = file.name.split('.').pop();
+                const filePath = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-      // Categories
-      document.querySelectorAll('.category-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.category-btn').forEach(b => {
-            b.classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
-            b.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
-          });
-          btn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
-          btn.classList.remove('bg-slate-100', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
+                const { data: uploadData, error: uploadError } = await supabase.storage.from('documents').upload(filePath, file);
+                if (uploadError) throw uploadError;
 
-          currentFilterCategory = btn.dataset.category;
-          renderDocuments();
-        });
-      });
+                const { data: publicUrlData } = supabase.storage.from('documents').getPublicUrl(filePath);
 
-      // Filters
-      document.getElementById('gradeFilter').addEventListener('change', (e) => {
-        currentFilterGrade = e.target.value;
-        renderDocuments();
-      });
+                // Lưu thông tin vào Database
+                const { error: dbError } = await supabase.from('documents').insert([{
+                    title: title,
+                    grade: grade,
+                    subject: subject,
+                    author: author,
+                    file_name: file.name,
+                    file_url: publicUrlData.publicUrl
+                }]);
 
-      document.getElementById('formatFilter').addEventListener('change', (e) => {
-        currentFilterFormat = e.target.value;
-        renderDocuments();
-      });
+                if (dbError) throw dbError;
 
-      document.getElementById('sortBy').addEventListener('change', (e) => {
-        currentSortBy = e.target.value;
-        renderDocuments();
-      });
-
-      document.getElementById('refreshDataBtn').addEventListener('click', () => {
-        showToast('Đang làm mới dữ liệu...');
-        loadDocuments();
-      });
-
-      // Toggle Favorites
-      const favBtn = document.getElementById('toggleFavoritesBtn');
-      favBtn.addEventListener('click', () => {
-        onlyFavorites = !onlyFavorites;
-        if (onlyFavorites) {
-          favBtn.classList.add('bg-red-500', 'text-white', 'dark:bg-red-600');
-          favBtn.classList.remove('bg-slate-100', 'dark:bg-slate-700/60');
-        } else {
-          favBtn.classList.remove('bg-red-500', 'text-white', 'dark:bg-red-600');
-          favBtn.classList.add('bg-slate-100', 'dark:bg-slate-700/60');
+                showToast("Tải tài liệu lên đám mây thành công!");
+                closeUploadModal();
+                fetchDocuments();
+            } catch (err) {
+                console.error(err);
+                showToast("Lỗi tải lên: " + (err.message || "Vui lòng thử lại"), true);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Tải lên ngay';
+            }
         }
-        renderDocuments();
-      });
 
-      // View Grid / List
-      const viewGridBtn = document.getElementById('viewGridBtn');
-      const viewListBtn = document.getElementById('viewListBtn');
-
-      viewGridBtn.addEventListener('click', () => {
-        currentViewMode = 'grid';
-        viewGridBtn.className = 'p-1.5 rounded-md bg-white dark:bg-slate-600 text-blue-600 dark:text-blue-400 shadow-xs transition';
-        viewListBtn.className = 'p-1.5 rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-800 transition';
-        renderDocuments();
-      });
-
-      viewListBtn.addEventListener('click', () => {
-        currentViewMode = 'list';
-        viewListBtn.className = 'p-1.5 rounded-md bg-white dark:bg-slate-600 text-blue-600 dark:text-blue-400 shadow-xs transition';
-        viewGridBtn.className = 'p-1.5 rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-800 transition';
-        renderDocuments();
-      });
-
-      // Theme toggle
-      document.getElementById('themeToggleBtn').addEventListener('click', () => {
-        document.documentElement.classList.toggle('dark');
-      });
-
-      // Backdrop modal clicks
-      window.addEventListener('click', (e) => {
-        if (e.target === document.getElementById('uploadModal')) closeUploadModal();
-        if (e.target === document.getElementById('settingsModal')) closeSettingsModal();
-        if (e.target === document.getElementById('previewModal')) closePreviewModal();
-      });
-
-      // Escape key
-      window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          closeUploadModal();
-          closeSettingsModal();
-          closePreviewModal();
+        function openUploadModal() {
+            document.getElementById('uploadModal').classList.remove('hidden');
         }
-      });
-    }
 
-    // --- Bootstrap ---
-    window.onload = function() {
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.classList.add('dark');
-      }
-
-      setupEventListeners();
-      initSupabase();
-      loadDocuments().then(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const sharedDocId = urlParams.get('doc');
-        if (sharedDocId) {
-          openPreviewModal(sharedDocId);
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.add('hidden');
+            document.getElementById('uploadForm').reset();
         }
-      });
 
-      lucide.createIcons();
-    };
-  </script>
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            document.getElementById('themeIcon').className = isDark ? 'fa-solid fa-sun text-amber-400' : 'fa-solid fa-moon';
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.innerHTML = `<i class="${isError ? 'fa-solid fa-circle-exclamation text-rose-400' : 'fa-solid fa-circle-check text-emerald-400'}"></i> ${msg}`;
+            toast.className = `fixed bottom-5 right-5 ${isError ? 'bg-rose-950 text-rose-100' : 'bg-slate-900 text-white'} px-4 py-2.5 rounded-xl shadow-xl text-xs flex items-center gap-2 transform translate-y-0 opacity-100 transition-all duration-300 z-50`;
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Tự động tải danh sách khi mở web
+        fetchDocuments();
+    </script>
 </body>
 </html>
