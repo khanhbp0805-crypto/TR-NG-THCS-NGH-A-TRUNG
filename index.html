@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KHO DỮ LIỆU THCS NGHĨA TRUNG</title>
+    <title>DocShare Hub - Kho Tài Liệu Dùng Chung</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -31,8 +31,8 @@
                 </div>
                 <div>
                     <span class="font-bold text-lg bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">DocShare Hub</span>
-                    <span id="cloudBadge" class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800">
-                        <i class="fa-solid fa-circle-check text-[10px] mr-1"></i>Sẵn sàng
+                    <span id="cloudBadge" class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800">
+                        <i class="fa-solid fa-cloud text-[10px] mr-1"></i>Đám Mây
                     </span>
                 </div>
             </div>
@@ -88,25 +88,20 @@
                         <option value="KHTN">KHTN</option>
                         <option value="Lịch sử - Địa lí">Lịch sử - Địa lí</option>
                         <option value="Tiếng Anh">Tiếng Anh</option>
-                        <option value="Mỹ Thuật">Mỹ Thuật</option>
-                        <option value="Âm Nhạc">Âm Nhạc</option>
-                        <option value="Công Nghệ">Công Nghệ</option>
                         <option value="Khác">Môn khác</option>
                     </select>
                 </div>
 
-                <div class="text-xs text-slate-500 font-medium" id="docsCountText">Đang hiển thị...</div>
+                <div class="text-xs text-slate-500 font-medium" id="docsCountText">Đang kết nối đám mây...</div>
             </div>
         </div>
 
         <!-- Document Grid -->
-        <div id="documentsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <!-- Render danh sách tài liệu -->
-        </div>
+        <div id="documentsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
         <div id="emptyState" class="hidden text-center py-16 bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
             <i class="fa-solid fa-folder-open text-4xl text-slate-300 mb-3"></i>
-            <p class="text-sm font-medium text-slate-500">Chưa tìm thấy tài liệu phù hợp.</p>
+            <p class="text-sm font-medium text-slate-500">Chưa có tài liệu nào trên hệ thống hoặc chưa tìm thấy tài liệu phù hợp.</p>
         </div>
     </main>
 
@@ -115,7 +110,7 @@
         <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-4 border border-slate-200 dark:border-slate-700 shadow-2xl">
             <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700">
                 <h3 class="font-bold text-base flex items-center gap-2 text-slate-800 dark:text-slate-100">
-                    <i class="fa-solid fa-cloud-arrow-up text-blue-600"></i> Tải Lên Tài Liệu Mới
+                    <i class="fa-solid fa-cloud-arrow-up text-blue-600"></i> Tải Lên Tài Liệu Dùng Chung
                 </h3>
                 <button type="button" onclick="closeUploadModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
                     <i class="fa-solid fa-xmark text-lg"></i>
@@ -130,7 +125,7 @@
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Tiêu đề tài liệu</label>
-                    <input type="text" id="docTitle" required placeholder="Ví dụ: Đề cương ôn tập Tin học 7 Giữa kì 1" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <input type="text" id="docTitle" required placeholder="Ví dụ: Kế hoạch bài dạy Tin học 7 Giữa kì 1" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
@@ -147,29 +142,25 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Môn học</label>
                         <select id="docSubject" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                        <option value="all">Mọi môn học</option>
-                        <option value="Tin học">Tin học</option>
-                        <option value="Toán học">Toán học</option>
-                        <option value="Ngữ văn">Ngữ văn</option>
-                        <option value="KHTN">KHTN</option>
-                        <option value="Lịch sử - Địa lí">Lịch sử - Địa lí</option>
-                        <option value="Tiếng Anh">Tiếng Anh</option>
-                        <option value="Mỹ Thuật">Mỹ Thuật</option>
-                        <option value="Âm Nhạc">Âm Nhạc</option>
-                        <option value="Công Nghệ">Công Nghệ</option>
-                        <option value="Khác">Môn khác</option>
+                            <option value="Tin học">Tin học</option>
+                            <option value="Toán học">Toán học</option>
+                            <option value="Ngữ văn">Ngữ văn</option>
+                            <option value="KHTN">KHTN</option>
+                            <option value="Lịch sử - Địa lí">Lịch sử - Địa lí</option>
+                            <option value="Tiếng Anh">Tiếng Anh</option>
+                            <option value="Khác">Khác</option>
                         </select>
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Người đăng</label>
-                    <input type="text" id="docAuthor" placeholder="Thầy/Cô hoặc Nhóm chuyên môn" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <input type="text" id="docAuthor" placeholder="Thầy/Cô hoặc Tên người gửi" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
 
                 <div class="pt-3 flex justify-end gap-2">
                     <button type="button" onclick="closeUploadModal()" class="px-4 py-2 rounded-lg text-xs text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700">Hủy</button>
-                    <button type="submit" id="btnSubmitUpload" class="px-5 py-2 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20">Tải lên ngay</button>
+                    <button type="submit" id="btnSubmitUpload" class="px-5 py-2 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20">Tải lên đám mây</button>
                 </div>
             </form>
         </div>
@@ -179,58 +170,40 @@
     <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50"></div>
 
     <script>
-        // Cấu hình URL Supabase của bạn
+        // CẤU HÌNH SUPABASE TRỰC TIẾP
         const SUPABASE_URL = 'https://bgiknnbsggoadndbcpds.supabase.co';
-        // Khóa anon công khai
-        const SUPABASE_KEY = '';
+        // Dán chuỗi Key đầy đủ của bạn vào đây:
+        const SUPABASE_KEY = 'sb_publishable_oMsYNHXY2soFAT6HRP03dA_Fomn_YOUR_ACTUAL_KEY';
 
         let sbClient = null;
         let allDocuments = [];
 
-        // Khởi tạo Supabase an toàn (không bao giờ gây treo trang)
         try {
-            if (window.supabase && SUPABASE_KEY && SUPABASE_KEY.trim() !== '') {
+            if (window.supabase && SUPABASE_KEY && !SUPABASE_KEY.includes('YOUR_ACTUAL_KEY')) {
                 sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             }
         } catch (e) {
-            console.warn("Không khởi tạo được client đám mây:", e);
+            console.error("Lỗi khởi tạo Supabase:", e);
         }
 
-        // Dữ liệu ban đầu
-        const initialDocs = [
-            { id: '1', title: 'Kế hoạch bài dạy Tin học 7 - Chủ đề 4: Ứng dụng tin học', grade: 'Khối 7', subject: 'Tin học', author: 'Tổ Tin học', file_name: 'KHBD-Tin-7.pdf', file_url: '#', created_at: new Date().toISOString() },
-            { id: '2', title: 'Đề cương ôn tập Toán 8 Học kì 1 có đáp án', grade: 'Khối 8', subject: 'Toán học', author: 'Thầy Tuấn', file_name: 'De-cuong-Toan-8.docx', file_url: '#', created_at: new Date().toISOString() },
-            { id: '3', title: 'Phiếu học tập môn KHTN 6 - Bài thực hành', grade: 'Khối 6', subject: 'KHTN', author: 'Cô Lan', file_name: 'Phieu-KHTN-6.pdf', file_url: '#', created_at: new Date().toISOString() }
-        ];
-
-        // Đọc dữ liệu đã lưu
-        function loadLocalDocuments() {
-            try {
-                const saved = localStorage.getItem('local_docs_data');
-                if (saved) {
-                    return JSON.parse(saved);
-                }
-            } catch (e) {}
-            return initialDocs;
-        }
-
-        // Tải tài liệu hiển thị ngay lập tức
         async function fetchDocuments() {
-            // Nạp dữ liệu nội bộ trước để giao diện hiển thị ngay lập tức
-            allDocuments = loadLocalDocuments();
-            renderDocuments(allDocuments);
+            const countText = document.getElementById('docsCountText');
+            if (!sbClient) {
+                if (countText) countText.innerText = "Chưa kết nối Supabase Key";
+                renderDocuments([]);
+                return;
+            }
 
-            // Nếu có kết nối Supabase, đồng bộ thêm từ đám mây trong nền
-            if (sbClient) {
-                try {
-                    const { data, error } = await sbClient.from('documents').select('*').order('created_at', { ascending: false });
-                    if (!error && data && data.length > 0) {
-                        allDocuments = data;
-                        renderDocuments(allDocuments);
-                    }
-                } catch (err) {
-                    console.warn("Chưa đồng bộ Supabase:", err);
-                }
+            try {
+                if (countText) countText.innerText = "Đang đồng bộ dữ liệu đám mây...";
+                const { data, error } = await sbClient.from('documents').select('*').order('created_at', { ascending: false });
+                if (error) throw error;
+                allDocuments = data || [];
+                renderDocuments(allDocuments);
+            } catch (err) {
+                console.error("Lỗi nạp tài liệu:", err);
+                if (countText) countText.innerText = "Lỗi kết nối CSDL";
+                alert("Lỗi khi tải danh sách tài liệu: " + (err.message || JSON.stringify(err)));
             }
         }
 
@@ -240,7 +213,7 @@
             const countText = document.getElementById('docsCountText');
 
             if (countText) {
-                countText.innerText = `Hiển thị ${docs.length} tài liệu`;
+                countText.innerText = `Đang hiển thị ${docs.length} tài liệu dùng chung`;
             }
 
             if (!container) return;
@@ -290,61 +263,68 @@
 
         async function handleUpload(e) {
             e.preventDefault();
+            if (!sbClient) {
+                alert("Chưa cấu hình Supabase Key hợp lệ!");
+                return;
+            }
+
             const fileInput = document.getElementById('fileInput');
             const file = fileInput.files[0];
             if (!file) return;
 
             const btn = document.getElementById('btnSubmitUpload');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-1"></i> Đang tải...';
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-1"></i> Đang tải lên đám mây...';
 
             const title = document.getElementById('docTitle').value;
             const grade = document.getElementById('docGrade').value;
             const subject = document.getElementById('docSubject').value;
             const author = document.getElementById('docAuthor').value || 'Giáo viên';
 
-            let fileUrl = URL.createObjectURL(file);
-
-            // Thử đưa lên Supabase nếu có client
-            if (sbClient) {
-                try {
-                    const fileExt = file.name.split('.').pop();
-                    const filePath = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
-                    const { error: upErr } = await sbClient.storage.from('documents').upload(filePath, file);
-                    if (!upErr) {
-                        const { data: pubData } = sbClient.storage.from('documents').getPublicUrl(filePath);
-                        fileUrl = pubData.publicUrl;
-                        await sbClient.from('documents').insert([{
-                            title, grade, subject, author,
-                            file_name: file.name,
-                            file_url: fileUrl
-                        }]);
-                    }
-                } catch (err) {
-                    console.warn("Lỗi lưu đám mây, chuyển lưu nội bộ:", err);
-                }
-            }
-
-            // Lưu trực tiếp vào danh sách hiển thị
-            const newDoc = {
-                id: Date.now().toString(),
-                title, grade, subject, author,
-                file_name: file.name,
-                file_url: fileUrl,
-                created_at: new Date().toISOString()
-            };
-
-            allDocuments.unshift(newDoc);
             try {
-                localStorage.setItem('local_docs_data', JSON.stringify(allDocuments));
-            } catch (e) {}
+                // Tạo tên file an toàn không trùng lặp
+                const fileExt = file.name.split('.').pop();
+                const cleanFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+                const filePath = `${Date.now()}_${cleanFileName}`;
 
-            renderDocuments(allDocuments);
-            closeUploadModal();
-            showToast("Tải lên tài liệu thành công!");
+                // 1. Tải tập tin lên Supabase Storage
+                const { error: uploadError } = await sbClient.storage.from('documents').upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
 
-            btn.disabled = false;
-            btn.innerText = 'Tải lên ngay';
+                if (uploadError) {
+                    throw new Error("Lỗi tải file lên kho (Storage): " + uploadError.message);
+                }
+
+                // 2. Lấy đường dẫn tải về công khai
+                const { data: publicUrlData } = sbClient.storage.from('documents').getPublicUrl(filePath);
+                const publicUrl = publicUrlData.publicUrl;
+
+                // 3. Ghi vào bảng Database
+                const { error: dbError } = await sbClient.from('documents').insert([{
+                    title: title,
+                    grade: grade,
+                    subject: subject,
+                    author: author,
+                    file_name: file.name,
+                    file_url: publicUrl
+                }]);
+
+                if (dbError) {
+                    throw new Error("Lỗi lưu thông tin vào cơ sở dữ liệu: " + dbError.message);
+                }
+
+                showToast("Đã tải lên và chia sẻ thành công!");
+                closeUploadModal();
+                await fetchDocuments();
+            } catch (err) {
+                console.error("Lỗi:", err);
+                alert(err.message || JSON.stringify(err));
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Tải lên đám mây';
+            }
         }
 
         function openUploadModal() {
@@ -374,9 +354,7 @@
             }, 3000);
         }
 
-        // Tự động chạy ngay khi load trang
         window.addEventListener('DOMContentLoaded', fetchDocuments);
-        fetchDocuments();
     </script>
 </body>
 </html>
